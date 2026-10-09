@@ -178,6 +178,9 @@ a{color:var(--accent)}
 .goal.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--surface2))}
 .backbtn{padding-left:8px;gap:4px}
 .backbtn svg,.wbar .icon svg{width:18px;height:18px;stroke:var(--fg);fill:none;stroke-width:2.2}
+.rot{grid-column:1 / -1;display:flex;flex-wrap:wrap;gap:4px 10px;font-size:12px;color:var(--muted)}
+.rot b{font-family:var(--f-display);color:var(--muted);margin-right:2px}
+.rot .on{color:var(--fg)}.rot .on b{color:var(--accent)}
 .cweek{display:grid;grid-template-columns:30px 1fr 52px auto 52px 38px;gap:6px;align-items:center}
 .cweek.on .cn{color:var(--accent)}
 .cweek .cn{font-family:var(--f-display);font-weight:700;font-size:18px;color:var(--muted)}
@@ -363,8 +366,73 @@ const LIB = {
   ,bici:{n:"Bici fija",g:"Cardio",e:"Bicicleta",inc:1,rest:0,cardio:true,cols:["nivel","min"],step:2,c:["Asiento a la altura de la cadera.","Opción intervalos: 30 s fuerte y 60 s suave.","Opción continua: ritmo moderado constante.","Anotá el nivel promedio y los minutos."],m:["Asiento demasiado bajo."]}
   ,remo_ergo:{n:"Remo ergómetro",g:"Cardio",e:"Remo",inc:1,rest:0,cardio:true,cols:["nivel","min"],step:2,c:["Empujá primero con las piernas.","Después llevá el torso un poco atrás.","Al final tirá con los brazos hacia el abdomen.","Volvé en orden inverso: brazos, torso, piernas."],m:["Tirar con los brazos antes que con las piernas."]}
   ,eliptica:{n:"Elíptica",g:"Cardio",e:"Elíptica",inc:1,rest:0,cardio:true,cols:["nivel","min"],step:2,c:["Postura erguida, mirada al frente.","Empujá y tirá de los brazos de forma activa.","Ritmo constante o intervalos.","Anotá el nivel y los minutos."],m:["Apoyar todo el peso en los brazos."]}
+  ,press_manc:{n:"Press de banca con mancuernas",g:"Pecho",e:"Mancuernas",inc:2,rest:120,c:["Acostado, mancuernas a los costados del pecho, escápulas juntas.","Pies firmes en el piso.","Empujá hacia arriba juntando un poco las mancuernas.","Bajá controlado hasta sentir el estiramiento. Anotá el peso de una mancuerna."],m:["Bajar demasiado rápido.","Abrir los codos a 90°."]}
+  ,press_incl_barra:{n:"Press inclinado con barra",g:"Pecho",e:"Barra",inc:2.5,rest:150,c:["Banco a 30°, barra encima de los ojos.","Escápulas atrás y abajo.","Bajá la barra a la parte alta del pecho.","Empujá vertical sin despegar la espalda."],m:["Banco muy inclinado.","Rebotar la barra."]}
+  ,press_maquina:{n:"Press de pecho en máquina",g:"Pecho",e:"Máquina",inc:5,rest:90,c:["Ajustá el asiento: agarres a la altura del pecho medio.","Espalda apoyada, escápulas atrás.","Empujá hasta casi estirar los brazos.","Volvé lento hasta sentir el estiramiento."],m:["Despegar la espalda del respaldo."]}
+  ,aperturas:{n:"Aperturas con mancuernas",g:"Pecho",e:"Mancuernas",inc:1,rest:75,c:["Acostado en banco plano, mancuernas arriba con palmas enfrentadas.","Codos levemente flexionados y fijos.","Abrí en arco hasta sentir el estiramiento del pecho.","Cerrá en el mismo arco apretando el pecho."],m:["Doblar los codos y convertirlo en press.","Bajar demasiado."]}
+  ,pec_deck:{n:"Pec deck (mariposa)",g:"Pecho",e:"Máquina",inc:5,rest:75,c:["Asiento a la altura que deje los brazos paralelos al piso.","Espalda apoyada.","Cerrá los brazos al frente apretando el pecho.","Volvé lento sin que se toquen las placas."],m:["Usar impulso."]}
+  ,chin_up:{n:"Dominadas supinas",g:"Espalda",e:"Peso corporal (+ lastre)",inc:2.5,rest:150,c:["Agarre con palmas hacia vos, al ancho de hombros.","Colgado con los hombros activos.","Tirá hasta pasar el mentón por encima de la barra.","Bajá controlado. Anotá el lastre (0 si no usás)."],m:["Balancearse.","Medias repeticiones."]}
+  ,jalon_cerrado:{n:"Jalón agarre cerrado",g:"Espalda",e:"Polea",inc:2.5,rest:90,c:["Agarre estrecho o triángulo.","Pecho arriba, leve inclinación hacia atrás.","Tirá hacia la parte alta del pecho llevando los codos abajo.","Subí controlado hasta estirar."],m:["Tirar con impulso del torso."]}
+  ,remo_t:{n:"Remo en T",g:"Espalda",e:"Barra o máquina",inc:2.5,rest:120,c:["Piernas a los lados de la barra, cadera atrás, espalda neutra.","Torso a unos 45°.","Tirá hacia el pecho bajo juntando las escápulas.","Bajá controlado sin redondear la espalda."],m:["Erguirse para subir más peso."]}
+  ,remo_incl_manc:{n:"Remo con mancuernas en banco inclinado",g:"Espalda",e:"Mancuernas",inc:2,rest:90,c:["Pecho apoyado en un banco a 30–45°.","Brazos colgando con las mancuernas.","Tirá llevando los codos atrás y juntando escápulas.","Bajá estirando por completo. Anotá el peso de una mancuerna."],m:["Despegar el pecho del banco."]}
+  ,press_arnold:{n:"Press Arnold",g:"Hombros",e:"Mancuernas",inc:2,rest:90,c:["Sentado, mancuernas frente a la cara con palmas hacia vos.","Mientras subís, rotá las palmas hacia adelante.","Terminá arriba con los brazos casi estirados.","Bajá rotando al revés. Anotá el peso de una mancuerna."],m:["Arquear la espalda."]}
+  ,press_hombro_maq:{n:"Press de hombro en máquina",g:"Hombros",e:"Máquina",inc:5,rest:90,c:["Asiento con los agarres a la altura de los hombros.","Espalda apoyada.","Empujá hacia arriba sin bloquear de golpe.","Bajá controlado."],m:["Despegar la espalda."]}
+  ,elev_lat_polea:{n:"Elevación lateral en polea",g:"Hombros",e:"Polea",inc:1,rest:60,c:["Polea baja, agarre con la mano del lado contrario.","Codo apenas flexionado.","Subí el brazo hacia el costado hasta la altura del hombro.","Bajá lento. Hacé todas con un brazo y después el otro."],m:["Inclinar el cuerpo para ayudarte."]}
+  ,pajaros:{n:"Pájaros (vuelos posteriores)",g:"Hombros",e:"Mancuernas",inc:1,rest:60,c:["Inclinado hacia adelante con la espalda neutra (o pecho apoyado en banco).","Mancuernas colgando, codos apenas flexionados.","Abrí los brazos hacia los costados apretando la parte de atrás del hombro.","Bajá lento."],m:["Usar impulso.","Subir los hombros a las orejas."]}
+  ,curl_incl:{n:"Curl inclinado con mancuernas",g:"Brazos",e:"Mancuernas",inc:1,rest:60,c:["Sentado en banco a 45°, brazos colgando.","Codos quietos apuntando al piso.","Subí las mancuernas sin adelantar los codos.","Bajá hasta estirar del todo."],m:["Adelantar los codos al subir."]}
+  ,curl_scott:{n:"Curl Scott (predicador)",g:"Brazos",e:"Barra Z o máquina",inc:2.5,rest:60,c:["Brazos apoyados en el pupitre.","Agarre al ancho de hombros.","Subí la barra apretando el bíceps.","Bajá controlado sin bloquear de golpe abajo."],m:["Despegar los codos del apoyo."]}
+  ,curl_z:{n:"Curl con barra Z",g:"Brazos",e:"Barra Z",inc:2.5,rest:60,c:["De pie, agarre en la parte angulada de la barra.","Codos pegados al cuerpo.","Subí sin balancear el torso.","Bajá lento hasta estirar."],m:["Balancear la espalda."]}
+  ,triceps_nuca:{n:"Extensión de tríceps sobre la cabeza",g:"Brazos",e:"Polea",inc:2.5,rest:60,c:["De espaldas a la polea, cuerda detrás de la cabeza.","Codos apuntando adelante y quietos.","Extendé los brazos hacia adelante y arriba.","Volvé hasta sentir el estiramiento."],m:["Abrir los codos."]}
+  ,press_cerrado:{n:"Press de banca agarre cerrado",g:"Brazos",e:"Barra",inc:2.5,rest:120,c:["Agarre al ancho de hombros.","Codos cerca del cuerpo.","Bajá la barra a la parte baja del pecho.","Empujá estirando los brazos."],m:["Agarre demasiado cerrado: carga las muñecas."]}
+  ,sent_frontal:{n:"Sentadilla frontal",g:"Piernas",e:"Barra",inc:2.5,rest:180,c:["Barra apoyada adelante sobre los hombros, codos altos.","Pies al ancho de hombros.","Bajá con el torso lo más vertical posible.","Subí empujando con todo el pie, codos arriba."],m:["Dejar caer los codos.","Redondear la espalda alta."]}
+  ,hack:{n:"Sentadilla hack",g:"Piernas",e:"Máquina",inc:5,rest:120,c:["Espalda bien apoyada en el respaldo.","Pies al ancho de hombros en el centro de la plataforma.","Bajá hasta unos 90° de rodilla o más.","Empujá sin bloquear las rodillas de golpe."],m:["Despegar la espalda.","Rodillas hacia adentro."]}
+  ,pm_sumo:{n:"Peso muerto sumo",g:"Piernas",e:"Barra",inc:5,rest:180,c:["Pies bien abiertos, puntas hacia afuera.","Agarre por dentro de las piernas.","Pecho arriba, empujá el piso abriendo las rodillas.","Terminá de pie con glúteos apretados."],m:["Rodillas que se cierran.","Espalda redondeada."]}
+  ,pm_manc:{n:"Peso muerto rumano con mancuernas",g:"Piernas",e:"Mancuernas",inc:2,rest:90,c:["De pie con una mancuerna en cada mano, rodillas apenas flexionadas.","Llevá la cadera atrás con las mancuernas cerca de las piernas.","Bajá hasta sentir el estiramiento en los isquios.","Volvé empujando la cadera adelante. Anotá el peso de una mancuerna."],m:["Redondear la espalda."]}
+  ,step_up:{n:"Subidas al cajón",g:"Piernas",e:"Mancuernas",inc:2,rest:75,c:["Cajón o banco a la altura de la rodilla.","Apoyá todo el pie de una pierna arriba.","Subí empujando con esa pierna, sin impulsarte con la de abajo.","Bajá controlado. Anotá reps por pierna y el peso de una mancuerna."],m:["Impulsarse con la pierna de abajo."]}
+  ,glute_bridge:{n:"Puente de glúteos con barra",g:"Piernas",e:"Barra",inc:5,rest:90,c:["Acostado en el piso, barra sobre la cadera con almohadilla.","Pies firmes cerca de la cola.","Subí la cadera apretando glúteos.","Aguantá un segundo arriba y bajá controlado."],m:["Arquear la zona lumbar."]}
+  ,curl_fem_sent:{n:"Curl femoral sentado",g:"Piernas",e:"Máquina",inc:2.5,rest:75,c:["Rodilla alineada con el eje de la máquina, muslos trabados.","Flexioná llevando el rodillo hacia abajo y atrás.","Apretá un segundo.","Volvé lento."],m:["Despegar la cola del asiento."]}
+  ,gemelos_sent:{n:"Gemelos sentado",g:"Piernas",e:"Máquina",inc:5,rest:60,c:["Rodillas bajo el apoyo, puntas en el borde.","Bajá el talón al máximo estiramiento.","Subí lo más alto posible y aguantá un segundo.","Ritmo lento, sin rebote."],m:["Rebotar abajo."]}
+  ,gemelos_prensa:{n:"Gemelos en prensa",g:"Piernas",e:"Máquina",inc:5,rest:60,c:["En la prensa, solo las puntas de los pies en el borde de la plataforma.","Piernas casi estiradas.","Empujá con las puntas lo más lejos posible.","Volvé hasta el máximo estiramiento."],m:["Doblar las rodillas para ayudarte."]}
+  ,rueda:{n:"Rueda abdominal",g:"Core",e:"Rueda",inc:0,rest:60,c:["De rodillas, manos en la rueda debajo de los hombros.","Abdomen apretado y cola metida.","Rodá hacia adelante hasta donde controles sin hundir la cadera.","Volvé tirando con el abdomen."],m:["Hundir la zona lumbar."]}
 };
 const GROUPS=["Pecho","Espalda","Hombros","Brazos","Piernas","Core","Cardio"];
+// ---------- Variantes: cada grupo trabaja el mismo músculo con el mismo movimiento ----------
+const VAR_GROUPS=[
+  ["press_banca","press_manc","press_incl_barra","press_maquina"],
+  ["press_incl_manc","press_incl_barra","press_manc","press_maquina"],
+  ["cruces_polea","aperturas","pec_deck"],
+  ["fondos","flexiones","press_maquina"],
+  ["dominadas","jalon","chin_up","jalon_cerrado"],
+  ["jalon","jalon_cerrado","chin_up","dominadas"],
+  ["remo_barra","remo_t","remo_manc","remo_incl_manc"],
+  ["remo_polea","remo_incl_manc","remo_manc","remo_t"],
+  ["remo_manc","remo_incl_manc","remo_polea","remo_t"],
+  ["press_militar","press_hombro_manc","press_arnold","press_hombro_maq"],
+  ["press_hombro_manc","press_arnold","press_hombro_maq","press_militar"],
+  ["elev_lat","elev_lat_polea"],
+  ["face_pull","pajaros"],
+  ["curl_barra","curl_incl","curl_scott","curl_z"],
+  ["curl_martillo","curl_z","curl_incl","curl_scott"],
+  ["triceps_polea","triceps_nuca","press_frances","press_cerrado"],
+  ["press_frances","triceps_nuca","press_cerrado","triceps_polea"],
+  ["sentadilla","sent_frontal","hack","goblet"],
+  ["prensa","hack","goblet","sent_frontal"],
+  ["goblet","hack","prensa","sent_frontal"],
+  ["peso_muerto","pm_sumo","peso_muerto_rumano","pm_manc"],
+  ["peso_muerto_rumano","pm_manc","pm_sumo","peso_muerto"],
+  ["hip_thrust","glute_bridge"],
+  ["zancada_bulgara","zancadas","step_up"],
+  ["zancadas","step_up","zancada_bulgara"],
+  ["curl_femoral","curl_fem_sent"],
+  ["gemelos","gemelos_sent","gemelos_prensa"],
+  ["crunch_polea","rueda","elev_piernas"],
+  ["elev_piernas","rueda","crunch_polea"],
+  ["plancha","escaladores"],
+  ["escaladores","plancha"],
+  ["cinta","bici","remo_ergo","eliptica"],["bici","remo_ergo","eliptica","cinta"],["remo_ergo","eliptica","cinta","bici"],["eliptica","cinta","bici","remo_ergo"]
+];
+const VAR_OF={};for(const g of VAR_GROUPS)if(!VAR_OF[g[0]])VAR_OF[g[0]]=g;
+const LETTERS="ABCD";
 
 const mk=a=>a.map(([id,sets,lo,hi])=>({id,sets,lo,hi}));
 const DAY={
@@ -464,6 +532,7 @@ const state={
   sessions:lsGet("gym.sessions")||[],
   draft:lsGet("gym.draft"),
   cycle:lsGet("gym.cycle"),
+  vary:lsGet("gym.vary"),
   tab:"train", importData:null, sheet:null, confirmFinish:false, confirmDel:null, confirmPlan:null, confirmGoal:null, rest:null
 };
 state.inWorkout=!!state.draft;
@@ -474,6 +543,20 @@ function cycleWeek(){const c=state.cycle;if(!c||!c.on||!c.weeks||!c.weeks.length
   const w=Math.round(Math.round((mondayOf(new Date())-mondayOf(c.start))/864e5)/7);const L=c.weeks.length;const i=((w%L)+L)%L;
   return {i,total:L,...c.weeks[i],id:"c"+i}}
 function saveCycle(){lsSet("gym.cycle",state.cycle)}
+function saveVary(){lsSet("gym.vary",state.vary)}
+function varyWeek(){const v=state.vary;if(!v||!v.on||!v.n)return null;
+  const w=Math.round(Math.round((mondayOf(new Date())-mondayOf(v.start))/864e5)/7);const i=((w%v.n)+v.n)%v.n;return {i,n:v.n,letter:LETTERS[i]}}
+// Ejercicios de un día para la semana de variante w (0 = tu rutina tal cual)
+function resolveDay(day,w){
+  const v=state.vary;if(w==null){const vw=varyWeek();w=vw?vw.i:0}
+  if(!w)return day.ex.map(e=>({...e,base:e.id}));
+  const used=new Set();
+  return day.ex.map(e=>{
+    let id=e.id;const g=VAR_OF[e.id];
+    const fixed=v&&v.keepMain&&MAIN.has(e.id);
+    if(g&&!fixed){for(let k=0;k<g.length;k++){const cand=g[(w+k)%g.length];if(!used.has(cand)&&!day.ex.some(o=>o!==e&&o.id===cand)){id=cand;break}}}
+    used.add(id);
+    return {...e,id,base:e.id}})}
 function rx(e){const base=e.rest??LIB[e.id]?.rest??90;const cw=cycleWeek();
   if(cw&&isStd(e.id)){const rest=cw.hi<=6?Math.max(base,150):cw.lo>=20?Math.min(base,60):base;return {lo:cw.lo,hi:cw.hi,rest}}
   return {lo:e.lo,hi:e.hi,rest:base}}
@@ -559,8 +642,8 @@ function viewHome(){
     <div class="goals">${Object.entries(GOALS).map(([k,g])=>`<button class="goal" data-act="goal-yes" data-k="${k}"><b>${g.n}</b><span>${esc(g.d)}</span></button>`).join("")}</div></section>`:""}
   ${nd&&!state.draft?(()=>{const cw=cycleWeek();return `<section class="hero" style="margin-top:12px">
     <div class="row between" style="align-items:flex-start"><div><div class="eyebrow">Hoy toca · ${esc(state.plan.name||"Tu rutina")} · ${esc(GOALS[goalOf()].n)}</div><h2>${esc(nd.name)}</h2></div><button class="btn sm ghost" data-act="tab" data-k="plan">Cambiar</button></div>
-    ${cw?`<div><span class="chip est">Semana ${cw.i+1} de ${cw.total} · ${esc(cw.n||"")} · ${cw.lo}–${cw.hi} reps</span></div>`:""}
-    <ul class="exlist">${nd.ex.map(e=>{const p=rx(e);const g=suggest(e.id,e.sets,p.lo,p.hi,cw&&isStd(e.id)?cw.id:null);
+    ${cw||varyWeek()?`<div class="row" style="flex-wrap:wrap;gap:6px">${cw?`<span class="chip est">Semana ${cw.i+1} de ${cw.total} · ${esc(cw.n||"")} · ${cw.lo}–${cw.hi} reps</span>`:""}${varyWeek()?`<span class="chip new">Ejercicios: variante ${varyWeek().letter} de ${varyWeek().n}</span>`:""}</div>`:""}
+    <ul class="exlist">${resolveDay(nd).map(e=>{const p=rx(e);const g=suggest(e.id,e.sets,p.lo,p.hi,cw&&isStd(e.id)?cw.id:null);
       return `<li><button class="row grow" data-act="info" data-id="${e.id}" style="text-align:left;align-items:center">${thumb(e.id,"sm")}<span class="grow"><span style="display:block;font-weight:600">${esc(exName(e.id))}</span><span class="sg ${g.kind} num">${esc(g.lastTxt)}${esc(g.short)}</span></span></button><span class="sx num">${e.sets} × ${p.lo}${p.hi!==p.lo?"–"+p.hi:""}${isStd(e.id)?"":" "+COLS(e.id)[1]}</span></li>`}).join("")}</ul>
     <button class="btn primary full" data-act="start" data-id="${nd.id}">Empezar ${esc(nd.name)}</button>
   </section>`})():(!nd?`<p class="muted">No tenés días en la rutina. Armá uno en la pestaña Rutina.</p>`:"")}
@@ -572,7 +655,7 @@ function viewHome(){
 function startWorkout(dayId){
   const day=state.plan.days.find(d=>d.id===dayId);if(!day)return;
   const cw=cycleWeek();
-  state.draft={dayId,dayName:day.name,cyc:cw?cw.id:null,cycName:cw?`Semana ${cw.i+1} · ${cw.n||""} ${cw.lo}–${cw.hi}`:null,startedAt:new Date().toISOString(),ex:day.ex.map(e=>{
+  state.draft={dayId,dayName:day.name,cyc:cw?cw.id:null,cycName:cw?`Semana ${cw.i+1} · ${cw.n||""} ${cw.lo}–${cw.hi}`:null,startedAt:new Date().toISOString(),vary:varyWeek()?varyWeek().letter:null,ex:resolveDay(day).map(e=>{
     const p=rx(e);const ph=cw&&isStd(e.id)?cw.id:null;
     const sg=suggest(e.id,e.sets,p.lo,p.hi,ph);
     return {id:e.id,lo:p.lo,hi:p.hi,rest:p.rest,sug:{kind:sg.kind,text:sg.text},prev:sg.last?sg.last.sets:null,
@@ -585,7 +668,7 @@ function viewWorkout(){
   const d=state.draft;
   const done=d.ex.reduce((a,e)=>a+e.sets.filter(s=>s.done).length,0), total=d.ex.reduce((a,e)=>a+e.sets.length,0);
   return `
-  <div class="wbar"><button class="icon" data-act="wback" aria-label="Volver al inicio">${ICON.back}</button><div class="grow"><div class="eyebrow"><span id="elapsed" class="num">${fmtTime((Date.now()-new Date(d.startedAt))/1000)}</span> · ${done}/${total} series${d.cycName?` · ${esc(d.cycName)}`:""}</div><h2>${esc(d.dayName)}</h2></div>
+  <div class="wbar"><button class="icon" data-act="wback" aria-label="Volver al inicio">${ICON.back}</button><div class="grow"><div class="eyebrow"><span id="elapsed" class="num">${fmtTime((Date.now()-new Date(d.startedAt))/1000)}</span> · ${done}/${total} series${d.cycName?` · ${esc(d.cycName)}`:""}${d.vary?` · variante ${d.vary}`:""}</div><h2>${esc(d.dayName)}</h2></div>
   <button class="btn sm ${state.confirmFinish?"":"primary"}" data-act="finish">Terminar</button></div>
   ${state.confirmFinish?`<div class="confirm" style="margin-top:12px"><b>¿Terminar el entrenamiento?</b><span class="note">Se guardan solo las series marcadas con ✓ (${done}).</span>
     <div class="row"><button class="btn primary grow" data-act="save">Guardar</button><button class="btn grow" data-act="keep">Seguir</button></div>
@@ -771,13 +854,22 @@ function viewPlan(){
     ${cy.weeks.map((w,i)=>`<div class="cweek ${cw.i===i?"on":""}"><span class="cn">S${i+1}</span><input id="cn-${i}" data-f="cname" data-i="${i}" value="${esc(w.n||"")}" aria-label="Nombre de la semana" class="ctext"><input id="cl-${i}" data-f="clo" data-i="${i}" inputmode="numeric" value="${w.lo}" aria-label="Reps mínimas"><span class="note">a</span><input id="ch-${i}" data-f="chi" data-i="${i}" inputmode="numeric" value="${w.hi}" aria-label="Reps máximas"><button class="icon" data-act="cyc-rm" data-i="${i}" aria-label="Quitar semana">${ICON.x}</button></div>`).join("")}
     <div class="row"><button class="btn sm grow" data-act="cyc-add">+ Agregar semana</button><button class="btn sm ghost grow" data-act="cyc-preset">Usar ejemplo 12·15·4·30</button></div>`:""}
   </section>
+  <section class="section">
+    <div class="row between"><h3>Variar ejercicios cada semana</h3><button class="btn sm ${state.vary&&state.vary.on?"":"primary"}" data-act="vary-toggle">${state.vary&&state.vary.on?"Desactivar":"Activar"}</button></div>
+    <div class="note">Cada semana cada ejercicio cambia por una variante que trabaja el mismo músculo (por ejemplo press de banca → con mancuernas → inclinado → máquina). La variante A es tu rutina tal cual. Cada variante guarda su propio historial de pesos.</div>
+    ${state.vary&&state.vary.on?(()=>{const vw=varyWeek();return `<div class="confirm">
+      <div class="row between"><button class="icon" data-act="vary-prev" aria-label="Variante anterior">${ICON.back}</button><div style="text-align:center"><div class="eyebrow">Esta semana</div><b>Variante ${vw.letter} de ${vw.n}</b></div><button class="icon" data-act="vary-next" aria-label="Variante siguiente" style="transform:scaleX(-1)">${ICON.back}</button></div>
+      <div class="row" style="justify-content:center;gap:6px"><span class="note">Variantes:</span>${[2,3,4].map(n=>`<button class="btn sm ${vw.n===n?"primary":""}" data-act="vary-n" data-n="${n}">${n}</button>`).join("")}</div>
+      <label class="row note" style="gap:8px;cursor:pointer"><input type="checkbox" id="vary-keep" ${state.vary.keepMain?"checked":""} style="width:20px;height:20px;accent-color:var(--accent)"> Mantener fijos los básicos (sentadilla, banca, peso muerto, press militar, remo con barra, dominadas)</label>
+    </div>`})():""}
+  </section>
   <div class="eyebrow" style="margin:22px 0 8px">Tus días · podés ajustar todo${cy&&cy.on?" (con el ciclo activo, el rango de reps lo marca la semana)":""}</div>
   <div class="stack">
   ${state.plan.days.map((d,di)=>`<section class="pday">
     <div class="row"><input class="pname grow" id="dn-${d.id}" data-f="dayname" data-day="${d.id}" value="${esc(d.name)}" aria-label="Nombre del día">
       <button class="icon" data-act="dayup" data-i="${di}" aria-label="Subir día">${ICON.up}</button></div>
     ${d.ex.map((e,ei)=>`<div class="pex">
-      <div class="nm row"><button data-act="info" data-id="${e.id}">${thumb(e.id,"sm")}</button><div class="grow"><button data-act="info" data-id="${e.id}" style="text-align:left;font-weight:600">${esc(exName(e.id))}</button><div class="note">${esc(LIB[e.id]?.g||"")}</div></div></div>
+      <div class="nm row"><button data-act="info" data-id="${e.id}">${thumb(e.id,"sm")}</button><div class="grow"><button data-act="info" data-id="${e.id}" style="text-align:left;font-weight:600">${esc(exName(e.id))}</button><div class="note">${esc(LIB[e.id]?.g||"")}</div></div></div>${state.vary&&state.vary.on?(()=>{const vw=varyWeek();const ids=Array.from({length:vw.n},(_,w)=>resolveDay(d,w)[ei].id);if(ids.every(x=>x===ids[0]))return "";return `<div class="rot">${ids.map((x,w)=>`<span class="${w===vw.i?"on":""}"><b>${LETTERS[w]}</b> ${esc(exName(x))}</span>`).join("")}</div>`})():""}
       <div class="ctl"><button class="icon" data-act="exup" data-day="${d.id}" data-i="${ei}" aria-label="Subir">${ICON.up}</button><button class="icon" data-act="exdown" data-day="${d.id}" data-i="${ei}" aria-label="Bajar">${ICON.down}</button><button class="icon" data-act="exrm" data-day="${d.id}" data-i="${ei}" aria-label="Quitar">${ICON.x}</button></div>
       <div class="nums"><input id="ps-${d.id}-${ei}" inputmode="numeric" data-f="psets" data-day="${d.id}" data-i="${ei}" value="${e.sets}" aria-label="Series"> series de
         <input id="pl-${d.id}-${ei}" inputmode="numeric" data-f="plo" data-day="${d.id}" data-i="${ei}" value="${e.lo}" aria-label="Reps mínimas"> a
@@ -816,6 +908,9 @@ document.addEventListener("click",ev=>{
     case "goal-yes":state.plan=buildPlan(state.plan.key||"tl4",t.dataset.k);state.confirmGoal=null;savePlanNow();render();window.scrollTo(0,0);toast(`Rutina armada para ${GOALS[t.dataset.k].n}`);break;
     case "cyc-toggle":{const c=state.cycle||{weeks:clone(CYCLE_PRESET)};c.on=!c.on;if(c.on)c.start=mondayOf(new Date()).toISOString();state.cycle=c;saveCycle();render();toast(c.on?"Ciclo activado: arrancás en la semana 1":"Ciclo desactivado");break}
     case "cyc-prev":case "cyc-next":{const d=new Date(state.cycle.start);d.setDate(d.getDate()+(a==="cyc-next"?-7:7));state.cycle.start=d.toISOString();saveCycle();render();break}
+    case "vary-toggle":{const v=state.vary||{n:4,keepMain:false};v.on=!v.on;if(v.on)v.start=mondayOf(new Date()).toISOString();state.vary=v;saveVary();render();toast(v.on?`Variantes activadas: esta semana es la A`:"Variantes desactivadas");break}
+    case "vary-n":{state.vary.n=+t.dataset.n;saveVary();render();break}
+    case "vary-prev":case "vary-next":{const d=new Date(state.vary.start);d.setDate(d.getDate()+(a==="vary-next"?-7:7));state.vary.start=d.toISOString();saveVary();render();break}
     case "cyc-add":state.cycle.weeks.push({n:"",lo:8,hi:12});saveCycle();render();break;
     case "cyc-rm":if(state.cycle.weeks.length>1){state.cycle.weeks.splice(+t.dataset.i,1);saveCycle();render()}break;
     case "cyc-preset":state.cycle.weeks=clone(CYCLE_PRESET);saveCycle();render();break;
@@ -829,7 +924,7 @@ document.addEventListener("click",ev=>{
     case "save":finishWorkout();break;
     case "discard":discardWorkout();break;
     case "export":exportBackup();break;
-    case "import-yes":{const d=state.importData;state.plan=d.plan;state.sessions=d.sessions;if(d.cycle!==undefined){state.cycle=d.cycle;saveCycle()}sortSessions();state.importData=null;lsSet("gym.plan",state.plan);lsSet("gym.sessions",state.sessions);render();toast(`Copia importada: ${state.sessions.length} entrenamientos`);break}
+    case "import-yes":{const d=state.importData;state.plan=d.plan;state.sessions=d.sessions;if(d.cycle!==undefined){state.cycle=d.cycle;saveCycle()}if(d.vary!==undefined){state.vary=d.vary;saveVary()}sortSessions();state.importData=null;lsSet("gym.plan",state.plan);lsSet("gym.sessions",state.sessions);render();toast(`Copia importada: ${state.sessions.length} entrenamientos`);break}
     case "import-no":state.importData=null;render();break;
     case "photo-pause":photoPlay(!photoTimer);break;
     case "photo-show":photoPlay(false);photoShow(+t.dataset.i);break;
@@ -873,10 +968,11 @@ document.addEventListener("input",ev=>{
 document.addEventListener("focusin",ev=>{const t=ev.target;if(t.tagName==="INPUT"&&t.dataset.f&&t.dataset.f!=="dayname")setTimeout(()=>{try{t.select()}catch(e){}},0)});
 document.addEventListener("change",ev=>{const f=ev.target.dataset.f;if(f==="plo"||f==="phi"||f==="psets"){const e=dayById(ev.target.dataset.day)?.ex[+ev.target.dataset.i];if(e&&e.hi<e.lo){e.hi=e.lo;savePlanNow();render()}}});
 document.addEventListener("keydown",ev=>{if(ev.key==="Escape"&&state.sheet)closeSheet()});
+document.addEventListener("change",ev=>{if(ev.target.id==="vary-keep"&&state.vary){state.vary.keepMain=ev.target.checked;saveVary();render()}});
 document.addEventListener("change",ev=>{const f=ev.target.dataset.f;if((f==="clo"||f==="chi")&&state.cycle){const w=state.cycle.weeks[+ev.target.dataset.i];if(w.hi<w.lo)w.hi=w.lo;saveCycle();render()}});
 
 async function exportBackup(){
-  const data=JSON.stringify({app:"libreta-gym",version:2,exportedAt:new Date().toISOString(),plan:state.plan,sessions:state.sessions,cycle:state.cycle||null},null,1);
+  const data=JSON.stringify({app:"libreta-gym",version:2,exportedAt:new Date().toISOString(),plan:state.plan,sessions:state.sessions,cycle:state.cycle||null,vary:state.vary||null},null,1);
   const name=`gym-copia-${new Date().toISOString().slice(0,10)}.json`;
   try{const f=new File([data],name,{type:"application/json"});
     if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:"Copia Libreta de gym"});return}}catch(e){if(e&&e.name==="AbortError")return}
