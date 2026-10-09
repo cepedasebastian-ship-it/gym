@@ -432,7 +432,9 @@ const VAR_GROUPS=[
   ["cinta","bici","remo_ergo","eliptica"],["bici","remo_ergo","eliptica","cinta"],["remo_ergo","eliptica","cinta","bici"],["eliptica","cinta","bici","remo_ergo"]
 ];
 const VAR_OF={};for(const g of VAR_GROUPS)if(!VAR_OF[g[0]])VAR_OF[g[0]]=g;
-const LETTERS="ABCD";
+const LETTERS="1234";
+// Nombre del día con el número de variante: "Full body A" + variante 2 = "Full body A2"
+function dayLabel(day,w){const vw=varyWeek();if(!vw)return day.name;const n=(w??vw.i)+1;return /\s[A-Z]$/.test(day.name)?day.name+n:`${day.name} · ${n}`}
 
 const mk=a=>a.map(([id,sets,lo,hi])=>({id,sets,lo,hi}));
 const DAY={
@@ -641,21 +643,21 @@ function viewHome(){
   ${!state.plan.goal?`<section class="hero" style="margin-top:12px"><div><div class="eyebrow">Primero lo primero</div><h2>¿Cuál es tu meta?</h2></div><div class="note">Arma tu rutina con los ejercicios, series, reps y descansos que corresponden. Lo podés cambiar cuando quieras en Rutina.</div>
     <div class="goals">${Object.entries(GOALS).map(([k,g])=>`<button class="goal" data-act="goal-yes" data-k="${k}"><b>${g.n}</b><span>${esc(g.d)}</span></button>`).join("")}</div></section>`:""}
   ${nd&&!state.draft?(()=>{const cw=cycleWeek();return `<section class="hero" style="margin-top:12px">
-    <div class="row between" style="align-items:flex-start"><div><div class="eyebrow">Hoy toca · ${esc(state.plan.name||"Tu rutina")} · ${esc(GOALS[goalOf()].n)}</div><h2>${esc(nd.name)}</h2></div><button class="btn sm ghost" data-act="tab" data-k="plan">Cambiar</button></div>
+    <div class="row between" style="align-items:flex-start"><div><div class="eyebrow">Hoy toca · ${esc(state.plan.name||"Tu rutina")} · ${esc(GOALS[goalOf()].n)}</div><h2>${esc(dayLabel(nd))}</h2></div><button class="btn sm ghost" data-act="tab" data-k="plan">Cambiar</button></div>
     ${cw||varyWeek()?`<div class="row" style="flex-wrap:wrap;gap:6px">${cw?`<span class="chip est">Semana ${cw.i+1} de ${cw.total} · ${esc(cw.n||"")} · ${cw.lo}–${cw.hi} reps</span>`:""}${varyWeek()?`<span class="chip new">Ejercicios: variante ${varyWeek().letter} de ${varyWeek().n}</span>`:""}</div>`:""}
     <ul class="exlist">${resolveDay(nd).map(e=>{const p=rx(e);const g=suggest(e.id,e.sets,p.lo,p.hi,cw&&isStd(e.id)?cw.id:null);
       return `<li><button class="row grow" data-act="info" data-id="${e.id}" style="text-align:left;align-items:center">${thumb(e.id,"sm")}<span class="grow"><span style="display:block;font-weight:600">${esc(exName(e.id))}</span><span class="sg ${g.kind} num">${esc(g.lastTxt)}${esc(g.short)}</span></span></button><span class="sx num">${e.sets} × ${p.lo}${p.hi!==p.lo?"–"+p.hi:""}${isStd(e.id)?"":" "+COLS(e.id)[1]}</span></li>`}).join("")}</ul>
-    <button class="btn primary full" data-act="start" data-id="${nd.id}">Empezar ${esc(nd.name)}</button>
+    <button class="btn primary full" data-act="start" data-id="${nd.id}">Empezar ${esc(dayLabel(nd))}</button>
   </section>`})():(!nd?`<p class="muted">No tenés días en la rutina. Armá uno en la pestaña Rutina.</p>`:"")}
   ${state.draft?"":`<div style="margin-top:22px" class="eyebrow">Otro día</div>
-  <div>${days.filter(d=>d!==nd).map(d=>`<div class="daycard"><div class="grow"><h3>${esc(d.name)}</h3><div class="note">${d.ex.length} ejercicios · último: ${lastDone(d.id)}</div></div><button class="btn sm" data-act="start" data-id="${d.id}">Empezar</button></div>`).join("")}</div>`}
+  <div>${days.filter(d=>d!==nd).map(d=>`<div class="daycard"><div class="grow"><h3>${esc(dayLabel(d))}</h3><div class="note">${d.ex.length} ejercicios · último: ${lastDone(d.id)}</div></div><button class="btn sm" data-act="start" data-id="${d.id}">Empezar</button></div>`).join("")}</div>`}
   <p class="note" style="margin-top:18px">Fotos: free-exercise-db (dominio público). Usala siempre desde el ícono de la pantalla de inicio: ahí quedan guardados tus datos.</p>`;
 }
 
 function startWorkout(dayId){
   const day=state.plan.days.find(d=>d.id===dayId);if(!day)return;
   const cw=cycleWeek();
-  state.draft={dayId,dayName:day.name,cyc:cw?cw.id:null,cycName:cw?`Semana ${cw.i+1} · ${cw.n||""} ${cw.lo}–${cw.hi}`:null,startedAt:new Date().toISOString(),vary:varyWeek()?varyWeek().letter:null,ex:resolveDay(day).map(e=>{
+  state.draft={dayId,dayName:dayLabel(day),cyc:cw?cw.id:null,cycName:cw?`Semana ${cw.i+1} · ${cw.n||""} ${cw.lo}–${cw.hi}`:null,startedAt:new Date().toISOString(),vary:varyWeek()?varyWeek().letter:null,ex:resolveDay(day).map(e=>{
     const p=rx(e);const ph=cw&&isStd(e.id)?cw.id:null;
     const sg=suggest(e.id,e.sets,p.lo,p.hi,ph);
     return {id:e.id,lo:p.lo,hi:p.hi,rest:p.rest,sug:{kind:sg.kind,text:sg.text},prev:sg.last?sg.last.sets:null,
@@ -668,7 +670,7 @@ function viewWorkout(){
   const d=state.draft;
   const done=d.ex.reduce((a,e)=>a+e.sets.filter(s=>s.done).length,0), total=d.ex.reduce((a,e)=>a+e.sets.length,0);
   return `
-  <div class="wbar"><button class="icon" data-act="wback" aria-label="Volver al inicio">${ICON.back}</button><div class="grow"><div class="eyebrow"><span id="elapsed" class="num">${fmtTime((Date.now()-new Date(d.startedAt))/1000)}</span> · ${done}/${total} series${d.cycName?` · ${esc(d.cycName)}`:""}${d.vary?` · variante ${d.vary}`:""}</div><h2>${esc(d.dayName)}</h2></div>
+  <div class="wbar"><button class="icon" data-act="wback" aria-label="Volver al inicio">${ICON.back}</button><div class="grow"><div class="eyebrow"><span id="elapsed" class="num">${fmtTime((Date.now()-new Date(d.startedAt))/1000)}</span> · ${done}/${total} series${d.cycName?` · ${esc(d.cycName)}`:""}</div><h2>${esc(d.dayName)}</h2></div>
   <button class="btn sm ${state.confirmFinish?"":"primary"}" data-act="finish">Terminar</button></div>
   ${state.confirmFinish?`<div class="confirm" style="margin-top:12px"><b>¿Terminar el entrenamiento?</b><span class="note">Se guardan solo las series marcadas con ✓ (${done}).</span>
     <div class="row"><button class="btn primary grow" data-act="save">Guardar</button><button class="btn grow" data-act="keep">Seguir</button></div>
@@ -856,7 +858,7 @@ function viewPlan(){
   </section>
   <section class="section">
     <div class="row between"><h3>Variar ejercicios cada semana</h3><button class="btn sm ${state.vary&&state.vary.on?"":"primary"}" data-act="vary-toggle">${state.vary&&state.vary.on?"Desactivar":"Activar"}</button></div>
-    <div class="note">Cada semana cada ejercicio cambia por una variante que trabaja el mismo músculo (por ejemplo press de banca → con mancuernas → inclinado → máquina). La variante A es tu rutina tal cual. Cada variante guarda su propio historial de pesos.</div>
+    <div class="note">Cada semana cada ejercicio cambia por una variante que trabaja el mismo músculo (por ejemplo press de banca → con mancuernas → inclinado → máquina). La variante 1 es tu rutina tal cual; el número aparece en el nombre del día (Full body A1, A2…). Cada variante guarda su propio historial de pesos.</div>
     ${state.vary&&state.vary.on?(()=>{const vw=varyWeek();return `<div class="confirm">
       <div class="row between"><button class="icon" data-act="vary-prev" aria-label="Variante anterior">${ICON.back}</button><div style="text-align:center"><div class="eyebrow">Esta semana</div><b>Variante ${vw.letter} de ${vw.n}</b></div><button class="icon" data-act="vary-next" aria-label="Variante siguiente" style="transform:scaleX(-1)">${ICON.back}</button></div>
       <div class="row" style="justify-content:center;gap:6px"><span class="note">Variantes:</span>${[2,3,4].map(n=>`<button class="btn sm ${vw.n===n?"primary":""}" data-act="vary-n" data-n="${n}">${n}</button>`).join("")}</div>
@@ -908,7 +910,7 @@ document.addEventListener("click",ev=>{
     case "goal-yes":state.plan=buildPlan(state.plan.key||"tl4",t.dataset.k);state.confirmGoal=null;savePlanNow();render();window.scrollTo(0,0);toast(`Rutina armada para ${GOALS[t.dataset.k].n}`);break;
     case "cyc-toggle":{const c=state.cycle||{weeks:clone(CYCLE_PRESET)};c.on=!c.on;if(c.on)c.start=mondayOf(new Date()).toISOString();state.cycle=c;saveCycle();render();toast(c.on?"Ciclo activado: arrancás en la semana 1":"Ciclo desactivado");break}
     case "cyc-prev":case "cyc-next":{const d=new Date(state.cycle.start);d.setDate(d.getDate()+(a==="cyc-next"?-7:7));state.cycle.start=d.toISOString();saveCycle();render();break}
-    case "vary-toggle":{const v=state.vary||{n:4,keepMain:false};v.on=!v.on;if(v.on)v.start=mondayOf(new Date()).toISOString();state.vary=v;saveVary();render();toast(v.on?`Variantes activadas: esta semana es la A`:"Variantes desactivadas");break}
+    case "vary-toggle":{const v=state.vary||{n:4,keepMain:false};v.on=!v.on;if(v.on)v.start=mondayOf(new Date()).toISOString();state.vary=v;saveVary();render();toast(v.on?`Variantes activadas: esta semana es la 1`:"Variantes desactivadas");break}
     case "vary-n":{state.vary.n=+t.dataset.n;saveVary();render();break}
     case "vary-prev":case "vary-next":{const d=new Date(state.vary.start);d.setDate(d.getDate()+(a==="vary-next"?-7:7));state.vary.start=d.toISOString();saveVary();render();break}
     case "cyc-add":state.cycle.weeks.push({n:"",lo:8,hi:12});saveCycle();render();break;
