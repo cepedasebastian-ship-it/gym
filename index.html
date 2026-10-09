@@ -59,7 +59,7 @@ a{color:var(--accent)}
 .top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding-block:8px 16px}
 .sync{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
 .dot{width:7px;height:7px;border-radius:50%;background:var(--muted)}
-.dot.ok{background:var(--good)}.dot.err{background:var(--bad)}
+.dot.ok{background:var(--good)}.dot.warn{background:var(--warn)}.dot.err{background:var(--bad)}
 
 /* hero day */
 .hero{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:14px}
@@ -181,6 +181,13 @@ a{color:var(--accent)}
 .rot{grid-column:1 / -1;display:flex;flex-wrap:wrap;gap:4px 10px;font-size:12px;color:var(--muted)}
 .rot b{font-family:var(--f-display);color:var(--muted);margin-right:2px}
 .rot .on{color:var(--fg)}.rot .on b{color:var(--accent)}
+.top{display:block}
+.top h1{margin-top:2px}
+.top .sync{margin-top:6px}
+.field{width:100%;min-width:0;height:48px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--fg);font:500 17px var(--f-body);padding:0 14px}
+.autherr{color:var(--bad);font-size:14px}
+.cloudcta{border-color:color-mix(in srgb,var(--warn) 45%,var(--line))}
+.btn[disabled]{opacity:.6}
 .cweek{display:grid;grid-template-columns:30px 1fr 52px auto 52px 38px;gap:6px;align-items:center}
 .cweek.on .cn{color:var(--accent)}
 .cweek .cn{font-family:var(--f-display);font-weight:700;font-size:18px;color:var(--muted)}
@@ -393,6 +400,7 @@ const LIB = {
   ,curl_fem_sent:{n:"Curl femoral sentado",g:"Piernas",e:"Máquina",inc:2.5,rest:75,c:["Rodilla alineada con el eje de la máquina, muslos trabados.","Flexioná llevando el rodillo hacia abajo y atrás.","Apretá un segundo.","Volvé lento."],m:["Despegar la cola del asiento."]}
   ,gemelos_sent:{n:"Gemelos sentado",g:"Piernas",e:"Máquina",inc:5,rest:60,c:["Rodillas bajo el apoyo, puntas en el borde.","Bajá el talón al máximo estiramiento.","Subí lo más alto posible y aguantá un segundo.","Ritmo lento, sin rebote."],m:["Rebotar abajo."]}
   ,gemelos_prensa:{n:"Gemelos en prensa",g:"Piernas",e:"Máquina",inc:5,rest:60,c:["En la prensa, solo las puntas de los pies en el borde de la plataforma.","Piernas casi estiradas.","Empujá con las puntas lo más lejos posible.","Volvé hasta el máximo estiramiento."],m:["Doblar las rodillas para ayudarte."]}
+  ,farmer:{n:"Farmer's carry (caminata con kettlebells)",g:"Core",e:"Kettlebells o mancuernas",inc:4,rest:90,cols:["kg por mano","seg"],step:5,c:["Agarrá una kettlebell pesada en cada mano, de pie y bien derecho.","Hombros atrás y abajo, abdomen firme, mirada al frente.","Caminá con pasos cortos y rápidos sin balancearte ni inclinarte hacia un lado.","Anotá el peso de una mano y los segundos que caminás. Apoyá las pesas con la espalda neutra, como un peso muerto."],m:["Encorvarse o subir los hombros a las orejas.","Dejar que las pesas golpeen las piernas."]}
   ,rueda:{n:"Rueda abdominal",g:"Core",e:"Rueda",inc:0,rest:60,c:["De rodillas, manos en la rueda debajo de los hombros.","Abdomen apretado y cola metida.","Rodá hacia adelante hasta donde controles sin hundir la cadera.","Volvé tirando con el abdomen."],m:["Hundir la zona lumbar."]}
 };
 const GROUPS=["Pecho","Espalda","Hombros","Brazos","Piernas","Core","Cardio"];
@@ -439,17 +447,17 @@ function dayLabel(day,w){const vw=varyWeek();if(!vw)return day.name;const n=(w??
 const mk=a=>a.map(([id,sets,lo,hi])=>({id,sets,lo,hi}));
 const DAY={
   fbA:["Full body A",[["sentadilla",3,6,8],["press_banca",3,6,8],["remo_barra",3,8,10],["elev_lat",3,12,15],["curl_barra",2,10,12],["crunch_polea",3,12,15]]],
-  fbB:["Full body B",[["peso_muerto_rumano",3,8,10],["press_militar",3,6,8],["jalon",3,10,12],["prensa",3,10,12],["triceps_polea",2,10,12],["gemelos",3,12,15]]],
+  fbB:["Full body B",[["peso_muerto_rumano",3,8,10],["press_militar",3,6,8],["jalon",3,10,12],["prensa",3,10,12],["triceps_polea",2,10,12],["gemelos",3,12,15],["farmer",3,30,45]]],
   fbC:["Full body C",[["zancada_bulgara",3,8,10],["press_incl_manc",3,8,12],["dominadas",3,6,10],["hip_thrust",3,8,12],["face_pull",3,12,15],["curl_martillo",2,10,12]]],
   tA:["Torso A",[["press_banca",4,6,8],["remo_barra",4,6,8],["press_hombro_manc",3,8,10],["jalon",3,10,12],["triceps_polea",3,10,12],["curl_barra",3,10,12]]],
   pA:["Pierna A",[["sentadilla",4,6,8],["peso_muerto_rumano",3,8,10],["prensa",3,10,12],["curl_femoral",3,10,12],["gemelos",4,12,15],["crunch_polea",3,12,15]]],
   tB:["Torso B",[["press_militar",4,6,8],["dominadas",4,6,10],["press_incl_manc",3,8,12],["remo_polea",3,10,12],["elev_lat",3,12,15],["curl_martillo",3,10,12]]],
-  pB:["Pierna B",[["peso_muerto",3,4,6],["zancada_bulgara",3,8,10],["hip_thrust",3,8,12],["extension_cuad",3,12,15],["curl_femoral",3,12,15],["elev_piernas",3,10,15]]],
+  pB:["Pierna B",[["peso_muerto",3,4,6],["zancada_bulgara",3,8,10],["hip_thrust",3,8,12],["extension_cuad",3,12,15],["curl_femoral",3,12,15],["elev_piernas",3,10,15],["farmer",3,30,45]]],
   emA:["Empuje A",[["press_banca",4,6,8],["press_militar",3,6,8],["press_incl_manc",3,8,12],["elev_lat",3,12,15],["triceps_polea",3,10,12],["fondos",2,8,12]]],
   tiA:["Tirón A",[["dominadas",4,6,10],["remo_barra",3,6,8],["remo_polea",3,10,12],["face_pull",3,12,15],["curl_barra",3,10,12],["curl_martillo",2,10,12]]],
   piA:["Pierna A",[["sentadilla",4,6,8],["peso_muerto_rumano",3,8,10],["prensa",3,10,12],["curl_femoral",3,10,12],["extension_cuad",2,12,15],["gemelos",4,12,15]]],
   emB:["Empuje B",[["press_militar",4,6,8],["press_incl_manc",3,8,12],["cruces_polea",3,12,15],["elev_lat",4,12,15],["press_frances",3,10,12],["triceps_polea",2,12,15]]],
-  tiB:["Tirón B",[["peso_muerto",3,4,6],["jalon",3,10,12],["remo_manc",3,8,12],["face_pull",3,12,15],["curl_martillo",3,10,12],["crunch_polea",3,12,15]]],
+  tiB:["Tirón B",[["peso_muerto",3,4,6],["jalon",3,10,12],["remo_manc",3,8,12],["face_pull",3,12,15],["curl_martillo",3,10,12],["crunch_polea",3,12,15],["farmer",3,30,45]]],
   piB:["Pierna B",[["zancada_bulgara",3,8,10],["hip_thrust",3,8,12],["prensa",3,12,15],["curl_femoral",3,12,15],["gemelos",4,12,15],["elev_piernas",3,10,15]]]
 };
 const PLANS=[
@@ -470,10 +478,10 @@ const CARDIO=["cinta","bici","remo_ergo","eliptica"];
 const TONO_SUB={sentadilla:"goblet",peso_muerto:"peso_muerto_rumano",press_militar:"press_hombro_manc",remo_barra:"remo_manc",fondos:"flexiones",dominadas:"jalon",zancada_bulgara:"zancadas"};
 function applyGoal(exs,goal,di){
   const base=exs.map(e=>({...e}));
-  if(goal==="fuerza")return base.slice(0,5).map(e=>MAIN.has(e.id)?{...e,sets:5,lo:3,hi:5,rest:180}:COMP2.has(e.id)?{...e,sets:3,lo:6,hi:8,rest:120}:{...e,sets:3,lo:8,hi:10,rest:90});
+  if(goal==="fuerza")return [...base.slice(0,5),...(base.slice(5).some(e=>e.id==="farmer")?[{id:"farmer",sets:3,lo:20,hi:30,rest:120}]:[])].map(e=>e.id==="farmer"?e:MAIN.has(e.id)?{...e,sets:5,lo:3,hi:5,rest:180}:COMP2.has(e.id)?{...e,sets:3,lo:6,hi:8,rest:120}:{...e,sets:3,lo:8,hi:10,rest:90});
   if(goal==="grasa"){
     const st=base.slice(0,4).map(e=>(MAIN.has(e.id)||COMP2.has(e.id))?{...e,sets:3,lo:8,hi:12,rest:75}:{...e,sets:3,lo:12,hi:15,rest:60});
-    const meta=di%2?{id:"escaladores",sets:3,lo:30,hi:45,rest:30}:{id:"kb_swing",sets:3,lo:15,hi:20,rest:45};
+    const meta=[{id:"kb_swing",sets:3,lo:15,hi:20,rest:45},{id:"escaladores",sets:3,lo:30,hi:45,rest:30},{id:"farmer",sets:3,lo:40,hi:60,rest:60}][di%3];
     return [...st,meta,{id:CARDIO[di%CARDIO.length],sets:1,lo:20,hi:30,rest:0}];
   }
   if(goal==="tono"){
@@ -515,18 +523,77 @@ const ICON={
 // ---------- Almacenamiento (nube con respaldo local) ----------
 const Store={mode:"local",status:"local"};
 function writer(fn){let running=false,pending,has=false;return async v=>{pending=v;has=true;if(running)return;running=true;while(has){const x=pending;has=false;try{await fn(x);setSync("ok")}catch(e){console.warn(e);await new Promise(r=>setTimeout(r,600+Math.random()*600));try{await fn(x);setSync("ok")}catch(e2){setSync("err")}}}running=false}}
-const writePlan=writer(async p=>{lsSet("gym.plan",p)});
+const touchSettings=()=>lsSet("gym.settingsAt",Date.now());
+const writePlan=writer(async p=>{lsSet("gym.plan",p);touchSettings();Cloud.soon()});
 const writeDraft=writer(async d=>{lsSet("gym.draft",d)});
-async function writeSession(s){lsSet("gym.sessions",state.sessions)}
-async function removeSession(id){lsSet("gym.sessions",state.sessions)}
+async function writeSession(s){lsSet("gym.sessions",state.sessions);Cloud.soon(300)}
+async function removeSession(id){lsSet("gym.sessions",state.sessions);const del=lsGet("gym.deleted")||[];if(!del.includes(id))del.push(id);lsSet("gym.deleted",del);Cloud.soon(300)}
+
+// ---------- Nube (Supabase): login con código por mail, un documento por usuario ----------
+const SB_URL="https://vvuzivdybqciscetnrly.supabase.co", SB_KEY="sb_publishable_pHzZ3dyaXNYs2xHrgGtIkw_e0tJS7gz";
+const Cloud={
+  ready:!SB_URL.startsWith("__"),
+  status:"off",timer:null,busy:false,again:false,
+  get sess(){return lsGet("gym.auth")},
+  set sess(v){lsSet("gym.auth",v)},
+  get on(){return this.ready&&!!this.sess},
+  async api(path,o={}){
+    const h={apikey:SB_KEY,"Content-Type":"application/json",...(o.headers||{})};
+    if(o.auth!==false){const t=await this.token();if(!t)throw Object.assign(new Error("Sin sesión"),{status:401});h.Authorization="Bearer "+t}
+    const r=await fetch(SB_URL+path,{method:o.method||"GET",headers:h,body:o.body?JSON.stringify(o.body):undefined,cache:"no-store"});
+    const txt=await r.text();let j=null;try{j=txt?JSON.parse(txt):null}catch(e){}
+    if(!r.ok){const e=new Error((j&&(j.msg||j.message||j.error_description||j.error))||("Error "+r.status));e.status=r.status;e.code=j&&(j.error_code||j.code);throw e}
+    return j},
+  saveSess(j){const old=this.sess||{};this.sess={access_token:j.access_token,refresh_token:j.refresh_token,expires_at:j.expires_at||Math.floor(Date.now()/1000)+(j.expires_in||3600),email:(j.user&&j.user.email)||old.email,uid:(j.user&&j.user.id)||old.uid}},
+  async token(){const s=this.sess;if(!s)return null;if(Date.now()/1000<s.expires_at-60)return s.access_token;
+    try{const j=await this.api("/auth/v1/token?grant_type=refresh_token",{method:"POST",auth:false,body:{refresh_token:s.refresh_token}});this.saveSess(j);return j.access_token}
+    catch(e){if(e.status===400||e.status===401){this.sess=null;this.status="off";render()}throw e}},
+  async signIn(email,password){const j=await this.api("/auth/v1/token?grant_type=password",{method:"POST",auth:false,body:{email,password}});this.saveSess(j)},
+  async signUp(email,password){const j=await this.api("/auth/v1/signup",{method:"POST",auth:false,body:{email,password}});
+    if(!j||!j.access_token){await this.signIn(email,password);return}this.saveSess(j)},
+  async logout(){try{await this.api("/auth/v1/logout",{method:"POST"})}catch(e){}this.sess=null;this.status="off";lsSet("gym.lastSync",null)},
+  localDoc(){return {v:1,plan:state.plan,cycle:state.cycle||null,vary:state.vary||null,settingsAt:lsGet("gym.settingsAt")||0,sessions:state.sessions,deleted:lsGet("gym.deleted")||[]}},
+  merge(L,C){
+    if(!C)return L;
+    const useC=(C.settingsAt||0)>(L.settingsAt||0);
+    const del=[...new Set([...(L.deleted||[]),...(C.deleted||[])])];const ds=new Set(del);
+    const byId=new Map();for(const s of [...(C.sessions||[]),...(L.sessions||[])])if(s&&s.id&&!ds.has(s.id))byId.set(s.id,s);
+    const S=useC?C:L;
+    return {v:1,plan:S.plan||L.plan,cycle:S.cycle??null,vary:S.vary??null,settingsAt:Math.max(L.settingsAt||0,C.settingsAt||0),sessions:[...byId.values()],deleted:del.slice(-500)}},
+  apply(D){
+    state.plan=D.plan;state.cycle=D.cycle;state.vary=D.vary;state.sessions=D.sessions;sortSessions();
+    lsSet("gym.plan",D.plan);lsSet("gym.cycle",D.cycle);lsSet("gym.vary",D.vary);lsSet("gym.sessions",state.sessions);lsSet("gym.deleted",D.deleted);lsSet("gym.settingsAt",D.settingsAt)},
+  soon(ms){if(!this.on)return;clearTimeout(this.timer);this.timer=setTimeout(()=>this.sync(),ms??2000)},
+  async sync(){
+    if(!this.on)return;if(this.busy){this.again=true;return}
+    this.busy=true;this.status="sync";setSync();
+    try{
+      const uid=this.sess.uid;
+      const rows=await this.api("/rest/v1/gym_data?select=data&user_id=eq."+uid);
+      const before=JSON.stringify(this.localDoc());
+      const M=this.merge(this.localDoc(),rows&&rows[0]?rows[0].data:null);
+      if(JSON.stringify(M)!==before){this.apply(M);if(!document.querySelector("input:focus"))render()}
+      await this.api("/rest/v1/gym_data?on_conflict=user_id",{method:"POST",headers:{Prefer:"resolution=merge-duplicates,return=minimal"},body:{user_id:uid,data:M,updated_at:new Date().toISOString()}});
+      lsSet("gym.lastSync",Date.now());this.status="ok";
+    }catch(e){console.warn(e);this.status=this.on?(navigator.onLine===false||!e.status?"offline":"err"):"off"}
+    this.busy=false;setSync();
+    if(this.again){this.again=false;this.soon(500)}
+  }
+};
+window.addEventListener("online",()=>Cloud.soon(500));
+let lastVis=0;document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&Date.now()-lastVis>60000){lastVis=Date.now();Cloud.soon(300)}});
 let draftTimer=null;
 function saveDraftSoon(){clearTimeout(draftTimer);draftTimer=setTimeout(()=>writeDraft(state.draft),1200)}
 function saveDraftNow(){clearTimeout(draftTimer);writeDraft(state.draft)}
-function setSync(s){Store.status=s;const el=$("#sync");if(el)el.outerHTML=syncHTML()}
+function setSync(){const el=$("#sync");if(el)el.outerHTML=syncHTML()}
 function syncHTML(){
-  const s=lsOK()?["ok","Guardado en este iPhone"]:["err","No se puede guardar: salí del modo privado"];
+  let s;
+  if(!lsOK())s=["err","No se puede guardar: salí del modo privado"];
+  else if(Cloud.on)s=Cloud.status==="sync"?["","Sincronizando…"]:Cloud.status==="offline"?["warn","Sin conexión: se sube cuando vuelva"]:Cloud.status==="err"?["err","No se pudo subir a la nube: se reintenta"]:["ok","Guardado en tu cuenta"];
+  else s=["warn","Solo en este iPhone"];
   return `<div class="sync" id="sync"><span class="dot ${s[0]}"></span>${s[1]}</div>`;
 }
+function header(eyebrow,title){return `<div class="top"><div class="eyebrow">${esc(eyebrow)}</div><h1>${esc(title)}</h1>${syncHTML()}</div>`}
 
 // ---------- Estado ----------
 const state={
@@ -535,6 +602,7 @@ const state={
   draft:lsGet("gym.draft"),
   cycle:lsGet("gym.cycle"),
   vary:lsGet("gym.vary"),
+  auth:{step:"email"},
   tab:"train", importData:null, sheet:null, confirmFinish:false, confirmDel:null, confirmPlan:null, confirmGoal:null, rest:null
 };
 state.inWorkout=!!state.draft;
@@ -544,8 +612,8 @@ function mondayOf(d){const x=new Date(d);x.setHours(0,0,0,0);x.setDate(x.getDate
 function cycleWeek(){const c=state.cycle;if(!c||!c.on||!c.weeks||!c.weeks.length)return null;
   const w=Math.round(Math.round((mondayOf(new Date())-mondayOf(c.start))/864e5)/7);const L=c.weeks.length;const i=((w%L)+L)%L;
   return {i,total:L,...c.weeks[i],id:"c"+i}}
-function saveCycle(){lsSet("gym.cycle",state.cycle)}
-function saveVary(){lsSet("gym.vary",state.vary)}
+function saveCycle(){lsSet("gym.cycle",state.cycle);touchSettings();Cloud.soon()}
+function saveVary(){lsSet("gym.vary",state.vary);touchSettings();Cloud.soon()}
 function varyWeek(){const v=state.vary;if(!v||!v.on||!v.n)return null;
   const w=Math.round(Math.round((mondayOf(new Date())-mondayOf(v.start))/864e5)/7);const i=((w%v.n)+v.n)%v.n;return {i,n:v.n,letter:LETTERS[i]}}
 // Ejercicios de un día para la semana de variante w (0 = tu rutina tal cual)
@@ -632,7 +700,8 @@ function viewHome(){
   const lastDays=last?Math.floor((Date.now()-new Date(last.date))/864e5):null;
   const lastDone=id=>{const s=state.sessions.find(s=>s.dayId===id);return s?fmtDate(s.date):"Nunca"};
   return `
-  <div class="top"><div><div class="eyebrow">${esc(new Date().toLocaleDateString("es-AR",{weekday:"long",day:"numeric",month:"long"}))}</div><h1>Libreta de gym</h1></div>${syncHTML()}</div>
+  ${header(new Date().toLocaleDateString("es-AR",{weekday:"long",day:"numeric",month:"long"}),"Libreta de gym")}
+  ${Cloud.ready&&!Cloud.on?`<section class="hero cloudcta" style="margin-bottom:12px"><div><div class="eyebrow">Tus datos están solo en este iPhone</div><h3>Guardalos en tu cuenta</h3></div><div class="note">Con tu mail y una contraseña se sincronizan solos. Si borrás la app o cambiás de teléfono, no perdés nada.</div><button class="btn primary full" data-act="goauth">Crear mi cuenta</button></section>`:""}
   <div class="stats">
     <div class="stat"><b class="num">${thisWeek}</b><span>entrenos esta semana</span></div>
     <div class="stat"><b class="num">${state.sessions.length}</b><span>entrenos en total</span></div>
@@ -651,7 +720,7 @@ function viewHome(){
   </section>`})():(!nd?`<p class="muted">No tenés días en la rutina. Armá uno en la pestaña Rutina.</p>`:"")}
   ${state.draft?"":`<div style="margin-top:22px" class="eyebrow">Otro día</div>
   <div>${days.filter(d=>d!==nd).map(d=>`<div class="daycard"><div class="grow"><h3>${esc(dayLabel(d))}</h3><div class="note">${d.ex.length} ejercicios · último: ${lastDone(d.id)}</div></div><button class="btn sm" data-act="start" data-id="${d.id}">Empezar</button></div>`).join("")}</div>`}
-  <p class="note" style="margin-top:18px">Versión 9 oct · variantes. Fotos: free-exercise-db (dominio público). Usala siempre desde el ícono de la pantalla de inicio: ahí quedan guardados tus datos.</p>`;
+  <p class="note" style="margin-top:18px">Versión 9 oct · cuenta. Fotos: free-exercise-db (dominio público). Usala siempre desde el ícono de la pantalla de inicio: ahí quedan guardados tus datos.</p>`;
 }
 
 function startWorkout(dayId){
@@ -827,8 +896,9 @@ function renderSheet(){
 
 // ---------- Historial ----------
 function viewHistory(){
-  if(!state.sessions.length)return `<div class="top"><h1>Historial</h1>${syncHTML()}</div><p class="muted">Cuando termines tu primer entrenamiento, aparece acá con cada serie que hiciste.</p>`;
-  return `<div class="top"><h1>Historial</h1>${syncHTML()}</div>
+  const hh=header(state.sessions.length===1?"1 entrenamiento":`${state.sessions.length} entrenamientos`,"Historial");
+  if(!state.sessions.length)return `${hh}<p class="muted">Cuando termines tu primer entrenamiento, aparece acá con cada serie que hiciste.</p>`;
+  return `${hh}
   ${state.sessions.map(s=>{
     const vol=s.entries.reduce((a,e)=>a+(isStd(e.id)?e.sets.reduce((b,x)=>b+x.w*x.r,0):0),0);
     const sets=s.entries.reduce((a,e)=>a+e.sets.length,0);
@@ -841,7 +911,8 @@ function viewHistory(){
 // ---------- Editor de rutina ----------
 function viewPlan(){
   const g=goalOf(),cy=state.cycle,cw=cycleWeek();
-  return `<div class="top"><div><h1>Rutina</h1><div class="note">Los cambios se guardan solos.</div></div>${syncHTML()}</div>
+  return `${header(`${state.plan.name||"Tu plan"} · ${GOALS[g].n}`,"Rutina")}
+  ${Cloud.ready&&!Cloud.on?authHTML():""}
   <div class="eyebrow" style="margin-bottom:8px">Tu meta</div>
   <div class="goals">${Object.entries(GOALS).map(([k,v])=>`<button class="goal ${g===k&&state.plan.goal?"on":""}" data-act="choosegoal" data-k="${k}"><b>${v.n}</b><span>${esc(v.d)}</span></button>`).join("")}</div>
   ${state.confirmGoal?`<div class="confirm" style="margin-top:10px"><b>¿Rearmar tu rutina para ${esc(GOALS[state.confirmGoal].n)}?</b><span class="note">Cambian los ejercicios, series, reps y descansos de ${esc(state.plan.name||"tu plan")}. Los ajustes que hiciste a mano se reemplazan; tu historial queda.</span><div class="row"><button class="btn primary grow" data-act="goal-yes" data-k="${state.confirmGoal}">Rearmar</button><button class="btn grow" data-act="goal-no">Cancelar</button></div></div>`:""}
@@ -881,14 +952,48 @@ function viewPlan(){
     ${state.confirmDel===d.id?`<div class="row"><span class="grow note">¿Borrar ${esc(d.name)}? Tu historial no se borra.</span><button class="btn sm danger" data-act="delday-yes" data-day="${d.id}">Borrar</button><button class="btn sm" data-act="delsess-no">No</button></div>`:`<button class="btn sm ghost muted" data-act="delday" data-day="${d.id}">Borrar día</button>`}
   </section>`).join("")}
   <button class="btn full" data-act="addday">+ Agregar día</button>
+  ${Cloud.on?authHTML():""}
   <section class="section"><h3>Copia de seguridad</h3>
-    <div class="note">Tus datos viven en este iPhone. Exportá una copia cada tanto (por ejemplo a Archivos o iCloud Drive) y, si cambiás de teléfono, importala acá.</div>
+    <div class="note">${Cloud.on?"Tus datos ya se guardan en tu cuenta. Igual podés bajar una copia en archivo cuando quieras.":"Tus datos viven en este iPhone. Exportá una copia cada tanto (por ejemplo a Archivos o iCloud Drive) y, si cambiás de teléfono, importala acá."}</div>
     <div class="row"><button class="btn sm grow" data-act="export">Exportar copia</button><label class="btn sm grow" for="importfile">Importar copia</label><input type="file" id="importfile" accept="application/json,.json" hidden></div>
     ${state.importData?`<div class="confirm"><b>¿Reemplazar tus datos con la copia?</b><span class="note">La copia tiene ${state.importData.sessions.length} entrenamientos. Lo que tenés ahora en este iPhone se reemplaza.</span><div class="row"><button class="btn primary grow" data-act="import-yes">Reemplazar</button><button class="btn grow" data-act="import-no">Cancelar</button></div></div>`:""}
   </section>
   <div class="note"><b>Cómo progresa:</b> la meta define series, reps y descansos. cada ejercicio tiene un rango de reps (por ejemplo 6–8). Cuando llegás al máximo en todas las series, la app te sugiere subir el peso la próxima vez. Si no llegás al mínimo, te sugiere mantenerlo.</div>
   </div>`;
 }
+function authHTML(){
+  const A=state.auth;
+  if(Cloud.on){const s=Cloud.sess;const ls=lsGet("gym.lastSync");
+    return `<section class="section" id="cuenta"><h3>Tu cuenta</h3>
+      <div class="note">Conectado como <b>${esc(s.email||"")}</b>. Cada entreno y cambio se sube solo. ${ls?`Última sincronización: ${esc(new Date(ls).toLocaleString("es-AR",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}))}.`:""}</div>
+      <div class="row"><button class="btn sm grow" data-act="sync-now">Sincronizar ahora</button>${A.confirmOut?`<button class="btn sm danger grow" data-act="logout-yes">Sí, cerrar sesión</button>`:`<button class="btn sm ghost grow" data-act="logout">Cerrar sesión</button>`}</div>
+      ${A.confirmOut?`<div class="note">Tus datos siguen en este iPhone y en tu cuenta. Al cerrar sesión, lo nuevo que anotes queda solo en el iPhone.</div>`:""}
+    </section>`}
+  const isNew=A.mode!=="login";
+  return `<section class="section authbox" id="cuenta"><h3>${isNew?"Creá tu cuenta":"Entrá a tu cuenta"}</h3>
+    <div class="note">Tus entrenamientos se sincronizan solos. Si borrás la app o cambiás de teléfono, entrás con el mismo mail y contraseña y vuelve todo.</div>
+    <input id="auth-email" class="field" type="email" inputmode="email" autocomplete="email" autocapitalize="off" placeholder="tu@mail.com" value="${esc(A.email||"")}">
+    <input id="auth-pass" class="field" type="password" autocomplete="${isNew?"new-password":"current-password"}" placeholder="${isNew?"Elegí una contraseña (mínimo 8)":"Contraseña"}" value="">
+    <button class="btn primary full" data-act="auth-go" ${A.busy?"disabled":""}>${A.busy?"Un momento…":isNew?"Crear cuenta y guardar mis datos":"Entrar"}</button>
+    ${A.err?`<div class="autherr">${esc(A.err)}</div>`:""}
+    <button class="btn sm ghost" data-act="auth-mode">${isNew?"Ya tengo cuenta: entrar":"No tengo cuenta: crear una"}</button>
+  </section>`}
+function authErr(e){const m=String(e&&e.message||"");
+  if(e&&e.status===429||/rate limit|too many/i.test(m))return "Demasiados intentos seguidos. Esperá unos minutos y probá de nuevo.";
+  if(/already registered|already exists/i.test(m))return "Ese mail ya tiene cuenta. Tocá «Ya tengo cuenta: entrar».";
+  if(/invalid login|invalid credentials/i.test(m))return "Mail o contraseña incorrectos.";
+  if(/password/i.test(m)&&/(short|least|weak)/i.test(m))return "La contraseña es muy corta o débil: usá al menos 8 caracteres.";
+  if(!e||!e.status)return "No hay conexión. Probá de nuevo cuando tengas internet.";
+  return "No se pudo: "+m}
+async function authGo(){
+  const A=state.auth;const em=(document.getElementById("auth-email")?.value||"").trim().toLowerCase();const pw=document.getElementById("auth-pass")?.value||"";
+  A.email=em;
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){A.err="Escribí un mail válido.";render();return}
+  if(pw.length<(A.mode==="login"?1:8)){A.err=A.mode==="login"?"Escribí tu contraseña.":"La contraseña tiene que tener al menos 8 caracteres.";render();return}
+  A.busy=true;A.err=null;render();
+  try{if(A.mode==="login")await Cloud.signIn(em,pw);else await Cloud.signUp(em,pw);
+    state.auth={step:"email"};render();toast("Listo: tus datos se guardan en tu cuenta");await Cloud.sync();render()}
+  catch(e){A.busy=false;A.err=authErr(e);render()}}
 const dayById=id=>state.plan.days.find(d=>d.id===id);
 let planTimer=null;
 function savePlanSoon(){clearTimeout(planTimer);planTimer=setTimeout(()=>writePlan(state.plan),700)}
@@ -926,7 +1031,13 @@ document.addEventListener("click",ev=>{
     case "save":finishWorkout();break;
     case "discard":discardWorkout();break;
     case "export":exportBackup();break;
-    case "import-yes":{const d=state.importData;state.plan=d.plan;state.sessions=d.sessions;if(d.cycle!==undefined){state.cycle=d.cycle;saveCycle()}if(d.vary!==undefined){state.vary=d.vary;saveVary()}sortSessions();state.importData=null;lsSet("gym.plan",state.plan);lsSet("gym.sessions",state.sessions);render();toast(`Copia importada: ${state.sessions.length} entrenamientos`);break}
+    case "goauth":state.tab="plan";render();setTimeout(()=>{document.getElementById("cuenta")?.scrollIntoView?.({block:"start"});document.getElementById("auth-email")?.focus()},50);break;
+    case "auth-go":authGo();break;
+    case "auth-mode":state.auth={mode:state.auth.mode==="login"?"new":"login",email:state.auth.email};render();break;
+    case "sync-now":Cloud.sync().then(()=>{render();toast(Cloud.status==="ok"?"Sincronizado":"No se pudo sincronizar ahora")});break;
+    case "logout":state.auth.confirmOut=true;render();break;
+    case "logout-yes":Cloud.logout().then(()=>{state.auth={step:"email"};render();toast("Sesión cerrada")});break;
+    case "import-yes":{const d=state.importData;state.plan=d.plan;state.sessions=d.sessions;touchSettings();if(d.cycle!==undefined){state.cycle=d.cycle;saveCycle()}if(d.vary!==undefined){state.vary=d.vary;saveVary()}sortSessions();state.importData=null;lsSet("gym.plan",state.plan);lsSet("gym.sessions",state.sessions);Cloud.soon(300);render();toast(`Copia importada: ${state.sessions.length} entrenamientos`);break}
     case "import-no":state.importData=null;render();break;
     case "photo-pause":photoPlay(!photoTimer);break;
     case "photo-show":photoPlay(false);photoShow(+t.dataset.i);break;
@@ -969,7 +1080,10 @@ document.addEventListener("input",ev=>{
 });
 document.addEventListener("focusin",ev=>{const t=ev.target;if(t.tagName==="INPUT"&&t.dataset.f&&t.dataset.f!=="dayname")setTimeout(()=>{try{t.select()}catch(e){}},0)});
 document.addEventListener("change",ev=>{const f=ev.target.dataset.f;if(f==="plo"||f==="phi"||f==="psets"){const e=dayById(ev.target.dataset.day)?.ex[+ev.target.dataset.i];if(e&&e.hi<e.lo){e.hi=e.lo;savePlanNow();render()}}});
-document.addEventListener("keydown",ev=>{if(ev.key==="Escape"&&state.sheet)closeSheet()});
+document.addEventListener("keydown",ev=>{if(ev.key==="Escape"&&state.sheet)closeSheet();
+  if(ev.key==="Enter"&&ev.target.id==="auth-email"){ev.preventDefault();document.getElementById("auth-pass")?.focus()}
+  if(ev.key==="Enter"&&ev.target.id==="auth-pass"){ev.preventDefault();authGo()}});
+document.addEventListener("input",ev=>{if(ev.target.id==="auth-email")state.auth.email=ev.target.value});
 document.addEventListener("change",ev=>{if(ev.target.id==="vary-keep"&&state.vary){state.vary.keepMain=ev.target.checked;saveVary();render()}});
 document.addEventListener("change",ev=>{const f=ev.target.dataset.f;if((f==="clo"||f==="chi")&&state.cycle){const w=state.cycle.weeks[+ev.target.dataset.i];if(w.hi<w.lo)w.hi=w.lo;saveCycle();render()}});
 
@@ -990,6 +1104,7 @@ sortSessions();
 try{history.replaceState({v:"home"},"");if(state.draft){history.pushState({v:"w"},"")}}catch(e){}
 render();
 if(state.draft)wake();
+if(Cloud.on)Cloud.sync();
 try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
 if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(r=>{try{r.update()}catch(e){}}).catch(()=>{}));
 </script>
