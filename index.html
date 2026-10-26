@@ -209,6 +209,13 @@ a{color:var(--accent)}
 .flash{position:fixed;inset:0;z-index:70;pointer-events:none;background:var(--good);opacity:0;animation:fl 1.5s ease-out}
 @keyframes fl{0%{opacity:.55}20%{opacity:.1}35%{opacity:.45}100%{opacity:0}}
 @media (prefers-reduced-motion:reduce){.flash{animation:none;opacity:.25}}
+.modesw{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:4px;margin-bottom:12px}
+.modesw button{display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px;border-radius:10px;font-weight:700;color:var(--muted)}
+.modesw button svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.modesw button.on{background:var(--accent);color:var(--accent-ink)}
+.kbs{display:flex;flex-wrap:wrap;gap:6px}
+.kbchip{min-height:38px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface2);font-weight:600;font-variant-numeric:tabular-nums;color:var(--muted)}
+.kbchip.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .cweek{display:grid;grid-template-columns:30px 1fr 52px auto 52px 38px;gap:6px;align-items:center}
 .cweek.on .cn{color:var(--accent)}
 .cweek .cn{font-family:var(--f-display);font-weight:700;font-size:18px;color:var(--muted)}
@@ -352,7 +359,7 @@ function figSVG(id,k,C,size){
 
 const FIGC={fig:"var(--fg)",far:"var(--far)",prop:"var(--prop)",load:"var(--accent)",bg:"var(--surface)"};
 const hasPhoto=id=>!!(typeof LIB!=="undefined"&&LIB[id]);
-const img=(id,i)=>`img/${id}_${i}.jpg`;
+const img=(id,i)=>`img/${(typeof LIB!=="undefined"&&LIB[id]&&LIB[id].ph)||id}_${i}.jpg`;
 const thumb=(id,cls="")=>hasPhoto(id)?`<span class="thumb ${cls}"><img src="${img(id,1)}" alt="" loading="lazy"></span>`:"";
 // ---------- Biblioteca de ejercicios ----------
 const LIB = {
@@ -387,9 +394,9 @@ const LIB = {
   ,goblet:{n:"Sentadilla goblet",g:"Piernas",e:"Mancuerna o kettlebell",inc:2,rest:90,c:["Sostené la mancuerna vertical pegada al pecho, codos hacia abajo.","Pies algo más anchos que los hombros, puntas un poco afuera.","Bajá entre las piernas manteniendo el pecho arriba, codos por dentro de las rodillas.","Subí empujando con todo el pie."],m:["Redondear la espalda abajo.","Despegar los talones."]}
   ,kb_swing:{n:"Swing con kettlebell",g:"Piernas",e:"Kettlebell",inc:4,rest:45,c:["Pies al ancho de hombros, kettlebell un poco adelante.","Llevá la cadera atrás (bisagra), no es una sentadilla.","Empujá la cadera fuerte hacia adelante: la pesa sube por el impulso hasta el pecho.","Dejala caer entre las piernas y encadená la siguiente."],m:["Levantar la pesa con los brazos.","Hacer sentadilla en vez de bisagra."]}
   ,zancadas:{n:"Zancadas con mancuernas",g:"Piernas",e:"Mancuernas",inc:2,rest:75,c:["De pie con una mancuerna en cada mano.","Da un paso largo adelante y bajá hasta que la rodilla de atrás casi toque el piso.","Empujá con el talón de adelante para volver.","Alterná piernas. Anotá las reps por pierna y el peso de una mancuerna."],m:["Rodilla de adelante que se va hacia adentro."]}
-  ,flexiones:{n:"Flexiones de brazos",g:"Pecho",e:"Peso corporal",inc:0,rest:60,c:["Manos un poco más anchas que los hombros, cuerpo recto de cabeza a talones.","Bajá el pecho hasta casi tocar el piso, codos a unos 45°.","Empujá hasta estirar los brazos.","Si cuesta, apoyá las rodillas. Anotá 0 kg salvo que uses lastre."],m:["Cadera hundida o muy arriba."]}
-  ,plancha:{n:"Plancha",g:"Core",e:"Peso corporal",inc:0,rest:45,cols:["kg extra","seg"],step:5,c:["Antebrazos apoyados, codos debajo de los hombros.","Cuerpo recto: apretá glúteos y abdomen.","Mantené la posición respirando normal.","Anotá los segundos que aguantás."],m:["Cadera muy alta o hundida."]}
-  ,escaladores:{n:"Escaladores",g:"Core",e:"Peso corporal",inc:0,rest:30,cols:["kg extra","seg"],step:5,c:["Posición de flexión con brazos estirados.","Llevá una rodilla al pecho y cambiá rápido de pierna.","Mantené la cadera baja y el ritmo constante.","Anotá los segundos de trabajo."],m:["Subir la cadera."]}
+  ,flexiones:{n:"Flexiones de brazos",home:true,g:"Pecho",e:"Peso corporal",inc:0,rest:60,c:["Manos un poco más anchas que los hombros, cuerpo recto de cabeza a talones.","Bajá el pecho hasta casi tocar el piso, codos a unos 45°.","Empujá hasta estirar los brazos.","Si cuesta, apoyá las rodillas. Anotá 0 kg salvo que uses lastre."],m:["Cadera hundida o muy arriba."]}
+  ,plancha:{n:"Plancha",home:true,g:"Core",e:"Peso corporal",inc:0,rest:45,cols:["kg extra","seg"],step:5,c:["Antebrazos apoyados, codos debajo de los hombros.","Cuerpo recto: apretá glúteos y abdomen.","Mantené la posición respirando normal.","Anotá los segundos que aguantás."],m:["Cadera muy alta o hundida."]}
+  ,escaladores:{n:"Escaladores",home:true,g:"Core",e:"Peso corporal",inc:0,rest:30,cols:["kg extra","seg"],step:5,c:["Posición de flexión con brazos estirados.","Llevá una rodilla al pecho y cambiá rápido de pierna.","Mantené la cadera baja y el ritmo constante.","Anotá los segundos de trabajo."],m:["Subir la cadera."]}
   ,cinta:{n:"Caminata en cinta inclinada",g:"Cardio",e:"Cinta",inc:1,rest:0,cardio:true,cols:["inclinación %","min"],step:2,c:["Velocidad de caminata rápida (5–6,5 km/h).","Inclinación entre 6 y 12 %.","Sin agarrarte de la cinta.","Ritmo en el que podés hablar con algo de esfuerzo."],m:["Colgarse de los manubrios."]}
   ,bici:{n:"Bici fija",g:"Cardio",e:"Bicicleta",inc:1,rest:0,cardio:true,cols:["nivel","min"],step:2,c:["Asiento a la altura de la cadera.","Opción intervalos: 30 s fuerte y 60 s suave.","Opción continua: ritmo moderado constante.","Anotá el nivel promedio y los minutos."],m:["Asiento demasiado bajo."]}
   ,remo_ergo:{n:"Remo ergómetro",g:"Cardio",e:"Remo",inc:1,rest:0,cardio:true,cols:["nivel","min"],step:2,c:["Empujá primero con las piernas.","Después llevá el torso un poco atrás.","Al final tirá con los brazos hacia el abdomen.","Volvé en orden inverso: brazos, torso, piernas."],m:["Tirar con los brazos antes que con las piernas."]}
@@ -428,7 +435,7 @@ const LIB = {
   ,patada_gluteo:{n:"Patada de glúteo en polea",g:"Piernas",e:"Polea",inc:2.5,rest:60,c:["Tobillera en polea baja, apoyate con las manos en la máquina.","Pierna apenas flexionada.","Llevá la pierna hacia atrás apretando el glúteo, sin arquear la espalda.","Volvé controlado. Hacé todas con una pierna y después la otra."],m:["Arquear la zona lumbar para subir más."]}
   ,remo_menton:{n:"Remo al mentón",g:"Hombros",e:"Barra",inc:2.5,rest:75,c:["Agarre algo más ancho que los hombros.","Subí la barra pegada al cuerpo llevando los codos hacia arriba y afuera.","Pará cuando los codos lleguen a la altura de los hombros.","Bajá lento."],m:["Agarre muy cerrado: molesta el hombro.","Subir más allá del hombro."]}
   ,pullover:{n:"Pullover con mancuerna",g:"Espalda",e:"Mancuerna",inc:2,rest:75,c:["Acostado en el banco, mancuerna arriba del pecho con las dos manos.","Codos levemente flexionados.","Bajá la mancuerna por detrás de la cabeza hasta sentir el estiramiento.","Volvé en arco hasta arriba del pecho."],m:["Doblar mucho los codos."]}
-  ,plancha_lateral:{n:"Plancha lateral",g:"Core",e:"Peso corporal",inc:0,rest:30,cols:["kg extra","seg"],step:5,c:["De costado, apoyado en el antebrazo, codo debajo del hombro.","Cuerpo en línea recta, cadera arriba.","Aguantá sin dejar caer la cadera.","Hacé el tiempo de un lado y después del otro. Anotá los segundos por lado."],m:["Cadera que se hunde."]}
+  ,plancha_lateral:{n:"Plancha lateral",home:true,g:"Core",e:"Peso corporal",inc:0,rest:30,cols:["kg extra","seg"],step:5,c:["De costado, apoyado en el antebrazo, codo debajo del hombro.","Cuerpo en línea recta, cadera arriba.","Aguantá sin dejar caer la cadera.","Hacé el tiempo de un lado y después del otro. Anotá los segundos por lado."],m:["Cadera que se hunde."]}
   ,pallof:{n:"Press Pallof",g:"Core",e:"Polea o banda",inc:2.5,rest:45,c:["De costado a la polea, agarre con las dos manos frente al pecho.","Pies al ancho de hombros, abdomen firme.","Estirá los brazos al frente sin dejar que el cuerpo gire.","Volvé al pecho. Hacé todas de un lado y después del otro."],m:["Rotar el torso hacia la polea."]}
   ,zancada_atras:{n:"Zancada hacia atrás",g:"Piernas",e:"Mancuernas",inc:2,rest:75,c:["De pie con una mancuerna en cada mano.","Da un paso largo hacia atrás y bajá hasta que la rodilla casi toque el piso.","Empujá con la pierna de adelante para volver.","Alterná piernas. Anotá reps por pierna y el peso de una mancuerna."],m:["Torso que se cae hacia adelante."]}
   ,sent_smith:{n:"Sentadilla en Smith",g:"Piernas",e:"Máquina Smith",inc:2.5,rest:120,c:["Barra sobre los trapecios, pies un poco adelantados.","Desbloqueá la barra girando las muñecas.","Bajá hasta el paralelo con la espalda neutra.","Subí empujando con todo el pie."],m:["Pies justo debajo de la barra: carga las rodillas."]}
@@ -440,8 +447,8 @@ const LIB = {
   ,pm_una_pierna:{n:"Peso muerto a una pierna",g:"Piernas",e:"Kettlebell o mancuerna",inc:2,rest:75,c:["De pie en una pierna, pesa en la mano contraria.","Llevá la cadera atrás mientras la otra pierna sube atrás, espalda recta.","Bajá hasta sentir el estiramiento del isquio.","Volvé apretando el glúteo. Hacé todas con una pierna y después la otra."],m:["Abrir la cadera hacia el costado."]}
   ,remo_invertido:{n:"Remo invertido",g:"Espalda",e:"Barra o anillas",inc:0,rest:75,c:["Colgado debajo de una barra a la altura de la cadera, cuerpo recto.","Talones apoyados en el piso.","Tirá el pecho hacia la barra juntando escápulas.","Bajá controlado. Más horizontal = más difícil."],m:["Cadera que se cae."]}
   ,lenador:{n:"Leñador en polea",g:"Core",e:"Polea",inc:2.5,rest:45,c:["De costado a la polea alta, agarre con las dos manos.","Brazos casi estirados.","Tirá en diagonal hacia la rodilla contraria girando el torso.","Volvé controlado. Hacé todas de un lado y después del otro."],m:["Tirar solo con los brazos."]}
-  ,crunch_inverso:{n:"Crunch inverso",g:"Core",e:"Peso corporal",inc:0,rest:45,c:["Acostado, rodillas dobladas a 90° arriba.","Manos al costado o agarradas detrás de la cabeza.","Enrollá la pelvis llevando las rodillas al pecho y despegando la cola.","Bajá lento sin apoyar los pies."],m:["Balancear las piernas con impulso."]}
-  ,dead_bug:{n:"Dead bug",g:"Core",e:"Peso corporal",inc:0,rest:45,c:["Acostado, brazos arriba y rodillas a 90°.","Zona lumbar pegada al piso.","Estirá un brazo y la pierna contraria sin despegar la espalda.","Volvé y cambiá de lado. Anotá reps totales."],m:["Despegar la zona lumbar."]}
+  ,crunch_inverso:{n:"Crunch inverso",home:true,g:"Core",e:"Peso corporal",inc:0,rest:45,c:["Acostado, rodillas dobladas a 90° arriba.","Manos al costado o agarradas detrás de la cabeza.","Enrollá la pelvis llevando las rodillas al pecho y despegando la cola.","Bajá lento sin apoyar los pies."],m:["Balancear las piernas con impulso."]}
+  ,dead_bug:{n:"Dead bug",home:true,g:"Core",e:"Peso corporal",inc:0,rest:45,c:["Acostado, brazos arriba y rodillas a 90°.","Zona lumbar pegada al piso.","Estirá un brazo y la pierna contraria sin despegar la espalda.","Volvé y cambiá de lado. Anotá reps totales."],m:["Despegar la zona lumbar."]}
   ,hiperext:{n:"Hiperextensiones (lumbares)",g:"Espalda",e:"Banco romano",inc:2.5,rest:60,c:["Cadera apoyada en el borde del banco, pies trabados.","Brazos cruzados al pecho (o con disco).","Bajá el torso doblando la cadera.","Subí hasta quedar en línea recta, sin pasarte."],m:["Arquear de más arriba."]}
   ,remo_maquina:{n:"Remo en máquina",g:"Espalda",e:"Máquina",inc:5,rest:90,c:["Pecho apoyado en el respaldo.","Agarres con brazos estirados.","Tirá llevando los codos atrás y juntando escápulas.","Volvé controlado."],m:["Despegar el pecho del apoyo."]}
   ,elev_frontal:{n:"Elevación frontal",g:"Hombros",e:"Mancuernas",inc:1,rest:60,c:["De pie, mancuernas delante de los muslos.","Subí un brazo (o los dos) al frente hasta la altura del hombro.","Codo apenas flexionado.","Bajá lento."],m:["Balancear el torso."]}
@@ -479,6 +486,39 @@ const LIB = {
   ,kb_windmill:{n:"Molino con kettlebell",g:"Core",e:"Kettlebell",inc:4,rest:60,c:["Kettlebell arriba con un brazo estirado, mirándola.","Pies abiertos, puntas giradas hacia el lado contrario a la pesa.","Bajá la otra mano por la pierna llevando la cadera hacia el costado de la pesa.","Volvé arriba manteniendo el brazo vertical. Hacé todas de un lado y después del otro."],m:["Doblar el brazo de arriba.","Apurarse."]}
   ,step_up_barra:{n:"Subidas al cajón con barra",g:"Piernas",e:"Barra",inc:2.5,rest:90,c:["Barra sobre los trapecios, frente a un cajón a la altura de la rodilla.","Apoyá todo el pie arriba.","Subí empujando con esa pierna, sin impulso de la de abajo.","Bajá controlado. Anotá reps por pierna."],m:["Cajón demasiado alto."]}
   ,remo_deltoides:{n:"Remo para deltoides posterior con barra",g:"Hombros",e:"Barra",inc:2.5,rest:60,c:["Agarre ancho, torso inclinado casi paralelo al piso.","Brazos colgando.","Tirá la barra hacia el pecho alto con los codos abiertos hacia afuera.","Bajá controlado."],m:["Usar impulso del torso."]}
+  ,kb_clean1:{n:"Cargada a un brazo con kettlebell",g:"Piernas",e:"Kettlebell",inc:4,rest:75,c:["Kettlebell en el piso entre los pies, bisagra de cadera con la espalda recta.","Llevá la pesa atrás entre las piernas como en un swing.","Empujá la cadera fuerte y llevá la pesa al rack (a la altura del hombro), codo pegado al cuerpo.","La pesa tiene que girar alrededor de la mano, no golpear el antebrazo. Anotá reps por brazo."],m:["Tirar con el brazo en vez de la cadera.","Dejar que la pesa golpee el antebrazo."]}
+  ,kb_push_press1:{n:"Push press a un brazo con kettlebell",g:"Hombros",e:"Kettlebell",inc:4,rest:90,c:["Kettlebell en rack a la altura del hombro.","Flexioná un poco las rodillas.","Extendé las piernas con fuerza y aprovechá el impulso para empujar la pesa arriba.","Bajala controlada al rack. Anotá reps por brazo."],m:["Arquear la espalda arriba."]}
+  ,press_suelo_kb:{n:"Press en el piso con kettlebell",g:"Pecho",e:"Kettlebell",inc:4,rest:75,c:["Acostado en el piso, rodillas dobladas, kettlebell en una mano con el codo apoyado.","La pesa descansa sobre el antebrazo.","Empujá hacia arriba hasta estirar el brazo.","Bajá hasta que el codo toque suave el piso. Anotá reps por brazo."],m:["Dejar caer la muñeca hacia atrás."]}
+  ,press_kb:{n:"Press militar a un brazo con kettlebell",g:"Hombros",e:"Kettlebell",inc:4,rest:90,c:["De pie, kettlebell en rack a la altura del hombro.","Glúteos y abdomen firmes, el otro brazo relajado.","Empujá recto hacia arriba sin inclinar el cuerpo.","Bajá controlado al rack. Anotá reps por brazo."],m:["Inclinarse hacia el costado para ayudarse."]}
+  ,press_kb_dos:{n:"Press militar con dos kettlebells",g:"Hombros",e:"Kettlebells",inc:4,rest:90,c:["Dos kettlebells en rack a la altura de los hombros.","Abdomen y glúteos firmes.","Empujá las dos pesas arriba hasta estirar los brazos.","Bajá controlado. Anotá el peso de una kettlebell."],m:["Arquear la zona lumbar."]}
+  ,kb_arnold:{n:"Press Arnold con kettlebell",g:"Hombros",e:"Kettlebell",inc:4,rest:75,c:["Kettlebell frente al hombro con la palma hacia vos.","Mientras subís, girá la palma hacia adelante.","Terminá con el brazo estirado arriba.","Bajá deshaciendo el giro. Anotá reps por brazo."],m:["Apurar el giro."]}
+  ,kb_seesaw:{n:"Press balancín con dos kettlebells",g:"Hombros",e:"Kettlebells",inc:4,rest:75,c:["Dos kettlebells en rack.","Empujá una arriba.","Mientras la bajás, subí la otra.","Seguí alternando sin pausa. Anotá reps totales."],m:["Torcer el torso."]}
+  ,press_suelo_alt:{n:"Press en el piso alternado con dos kettlebells",g:"Pecho",e:"Kettlebells",inc:4,rest:75,c:["Acostado en el piso con una kettlebell en cada mano arriba del pecho.","Bajá una hasta que el codo toque el piso.","Subila mientras bajás la otra.","Alterná. Anotá reps totales."],m:["Golpear los codos contra el piso."]}
+  ,triceps_kb:{n:"Extensión de tríceps con kettlebell",g:"Brazos",e:"Kettlebell",ph:"triceps_manc",inc:4,rest:60,c:["De pie o sentado, kettlebell agarrada de los cuernos arriba de la cabeza.","Codos apuntando al techo y cerca de la cabeza.","Bajá la pesa por detrás de la nuca doblando solo los codos.","Subí estirando los brazos."],m:["Abrir los codos hacia afuera."]}
+  ,press_frances_kb:{n:"Press francés con kettlebell",g:"Brazos",e:"Kettlebell",ph:"press_frances_manc",inc:4,rest:60,c:["Acostado en el piso o banco, kettlebell agarrada de los cuernos arriba del pecho.","Codos apuntando al techo.","Bajá la pesa hacia la frente doblando solo los codos.","Extendé hasta estirar."],m:["Mover los hombros."]}
+  ,curl_kb:{n:"Curl con kettlebell",g:"Brazos",e:"Kettlebell",ph:"curl_manc",inc:4,rest:60,c:["De pie, kettlebell agarrada del asa con la mano hacia adelante (o de los cuernos con las dos manos).","Codos pegados al cuerpo.","Subí sin balancear el torso.","Bajá lento. Si es a un brazo, anotá reps por brazo."],m:["Balancear la espalda."]}
+  ,curl_martillo_kb:{n:"Curl martillo con kettlebell",g:"Brazos",e:"Kettlebell",ph:"curl_martillo",inc:4,rest:60,c:["De pie, kettlebell colgando con la palma mirando hacia el cuerpo.","Codo pegado al costado.","Subí la pesa hasta el hombro sin girar la muñeca.","Bajá lento. Anotá reps por brazo."],m:["Mover el codo hacia adelante."]}
+  ,kb_dead_clean:{n:"Cargada desde el piso con kettlebell",g:"Piernas",e:"Kettlebell",inc:4,rest:75,c:["Kettlebell en el piso entre los pies.","Bisagra de cadera y agarrala con la espalda recta.","Empujá el piso y la cadera adelante llevando la pesa directo al rack.","Bajala al piso en cada repetición. Anotá reps por brazo."],m:["Redondear la espalda al levantar."]}
+  ,kb_hang_clean:{n:"Cargada colgante con kettlebell",g:"Piernas",e:"Kettlebell",inc:4,rest:75,c:["De pie con la kettlebell colgando entre las piernas.","Bisagra de cadera corta.","Empujá la cadera y llevá la pesa al rack.","Volvé a bajarla entre las piernas sin apoyarla. Anotá reps por brazo."],m:["Tirar con el brazo."]}
+  ,kb_snatch:{n:"Arranque a un brazo con kettlebell",g:"Hombros",e:"Kettlebell",inc:4,rest:90,c:["Avanzado: aprendé primero swing y cargada.","Swing entre las piernas y empujá fuerte la cadera.","Llevá la pesa en un solo movimiento hasta arriba con el brazo estirado, metiendo la mano para que no golpee.","Bajala controlada al swing. Anotá reps por brazo."],m:["Dejar que la pesa golpee el antebrazo.","Hacerlo sin dominar el swing."]}
+  ,kb_figura8:{n:"Figura 8 con kettlebell",g:"Core",e:"Kettlebell",inc:4,rest:45,c:["Piernas abiertas, cadera atrás y espalda recta.","Pasá la kettlebell entre las piernas de una mano a la otra.","Dibujá un 8 alrededor de las piernas.","Mantené la espalda recta todo el tiempo. Anotá pases totales."],m:["Redondear la espalda."]}
+  ,kb_pass:{n:"Pase de kettlebell entre las piernas",g:"Core",e:"Kettlebell",inc:4,rest:45,c:["Piernas separadas, semisentadilla.","Pasá la pesa por debajo de una pierna a la otra mano.","Seguí alternando.","Abdomen firme. Anotá pases totales."],m:["Perder la postura de la espalda."]}
+  ,kb_pirata:{n:"Barcos piratas con kettlebell",g:"Hombros",e:"Kettlebell",inc:4,rest:60,c:["Piernas abiertas, kettlebell agarrada de los cuernos colgando entre las piernas.","Brazos estirados.","Subí la pesa en arco hacia un lado hasta arriba de la cabeza, girando un poco el torso.","Bajá y repetí hacia el otro lado. Anotá reps totales."],m:["Doblar mucho los codos."]}
+  ,lunge_pass:{n:"Zancada con pase de kettlebell",g:"Piernas",e:"Kettlebell",inc:4,rest:75,c:["De pie con una kettlebell en una mano.","Da un paso adelante y bajá en zancada.","Pasá la pesa por debajo de la pierna de adelante a la otra mano.","Volvé y cambiá de pierna. Anotá reps totales."],m:["Rodilla de atrás que golpea el piso."]}
+  ,remo_kb_dos:{n:"Remo con dos kettlebells",g:"Espalda",e:"Kettlebells",inc:4,rest:90,c:["Torso inclinado a unos 45°, espalda recta, una kettlebell en cada mano.","Brazos colgando.","Tirá las dos pesas hacia la cadera juntando escápulas.","Bajá controlado. Anotá el peso de una."],m:["Redondear la espalda."]}
+  ,remo_alt_kb:{n:"Remo alternado con dos kettlebells",g:"Espalda",e:"Kettlebells",inc:4,rest:75,c:["Inclinado con la espalda recta, una kettlebell en cada mano.","Tirá una hacia la cadera.","Mientras la bajás, tirá la otra.","Alterná sin girar el torso. Anotá reps totales."],m:["Rotar el torso."]}
+  ,zancada_kb:{n:"Zancada goblet con kettlebell",g:"Piernas",e:"Kettlebell",ph:"zancadas",inc:4,rest:75,c:["Kettlebell agarrada de los cuernos contra el pecho.","Da un paso adelante (o atrás) y bajá hasta casi tocar el piso con la rodilla.","Empujá con la pierna de adelante para volver.","Alterná piernas. Anotá reps por pierna."],m:["Rodilla de adelante hacia adentro."]}
+  ,step_up_kb:{n:"Subidas a la silla con kettlebell",g:"Piernas",e:"Kettlebell",ph:"step_up",inc:4,rest:75,c:["Silla firme o cajón a la altura de la rodilla, kettlebell en goblet o en una mano.","Apoyá todo el pie arriba.","Subí empujando con esa pierna, sin impulso de la de abajo.","Bajá controlado. Anotá reps por pierna."],m:["Silla que se mueve: apoyala contra la pared."]}
+  ,pm_kb:{n:"Peso muerto rumano con kettlebell",g:"Piernas",e:"Kettlebell",ph:"pm_manc",inc:4,rest:75,c:["De pie con la kettlebell agarrada con las dos manos frente a los muslos.","Rodillas apenas flexionadas.","Llevá la cadera atrás bajando la pesa pegada a las piernas.","Volvé empujando la cadera adelante."],m:["Redondear la espalda."]}
+  ,gemelos_kb:{n:"Gemelos con kettlebell",g:"Piernas",e:"Kettlebell",ph:"gemelos_manc",inc:4,rest:45,c:["De pie con la kettlebell en una mano, puntas en un escalón.","Agarrate de algo con la otra mano.","Subí lo más alto posible y bajá lento.","Hacé de a una pierna para que cueste más."],m:["Rebotar abajo."]}
+  ,suitcase:{n:"Caminata maletero con kettlebell",g:"Core",e:"Kettlebell",ph:"farmer",inc:4,rest:60,cols:["kg","seg"],step:5,c:["Una sola kettlebell pesada en una mano, como una valija.","Caminá bien derecho sin inclinarte hacia el lado de la pesa.","Abdomen firme, hombros a la misma altura.","Cambiá de mano a mitad de tiempo. Anotá los segundos totales."],m:["Inclinarse hacia el lado de la pesa."]}
+  ,emom_kb:{n:"EMOM kettlebell (swing + goblet)",g:"Cardio",e:"Kettlebell",ph:"kb_swing",inc:4,rest:0,cardio:true,cols:["kg","min"],step:2,c:["Poné un cronómetro: cada minuto empezás de nuevo.","En cada minuto: 10 swings + 5 sentadillas goblet.","Lo que sobra del minuto es tu descanso.","Anotá el peso y los minutos que completaste."],m:["Perder la técnica por apurarse."]}
+  ,circuito_kb:{n:"Circuito kettlebell (cargada + press + sentadilla)",g:"Cardio",e:"Kettlebell",ph:"kb_thruster",inc:4,rest:0,cardio:true,cols:["kg","min"],step:2,c:["Con una kettlebell liviana: 5 cargadas, 5 press y 5 sentadillas por lado, sin soltarla.","Descansá 30–45 s y repetí.","Seguí hasta completar los minutos.","Anotá el peso y los minutos totales."],m:["Usar una pesa demasiado pesada."]}
+  ,salto_soga:{n:"Salto de soga",g:"Cardio",e:"Soga",home:true,inc:1,rest:0,cardio:true,cols:["ritmo 1–10","min"],step:2,c:["Saltos chicos, en la punta de los pies.","Codos pegados al cuerpo, girá la soga con las muñecas.","Podés hacer intervalos: 30 s rápido y 30 s suave.","Anotá cómo te sentiste (1–10) y los minutos."],m:["Saltar muy alto."]}
+  ,star_jump:{n:"Saltos de estrella (intervalos)",g:"Cardio",e:"Peso corporal",home:true,inc:1,rest:0,cardio:true,cols:["ritmo 1–10","min"],step:2,c:["Desde semisentadilla, saltá abriendo brazos y piernas como una estrella.","Caé suave con las rodillas flexionadas.","Hacé 30 s de saltos y 30 s de descanso.","Anotá ritmo (1–10) y minutos totales."],m:["Caer con las piernas rígidas."]}
+  ,sent_libre:{n:"Sentadilla sin peso",g:"Piernas",e:"Peso corporal",home:true,inc:0,rest:45,c:["Pies al ancho de hombros.","Bajá con los brazos al frente hasta el paralelo.","Subí empujando con todo el pie.","Anotá 0 kg."],m:["Levantar los talones."]}
+  ,puente_una_pierna:{n:"Puente de glúteo a una pierna",g:"Piernas",e:"Peso corporal o kettlebell",home:true,inc:4,rest:60,c:["Acostado, una pierna doblada y la otra estirada arriba.","Si querés más peso, apoyá la kettlebell sobre la cadera.","Subí la cadera apretando el glúteo de la pierna apoyada.","Bajá lento. Anotá reps por pierna."],m:["Arquear la zona lumbar."]}
+  ,fondos_banco:{n:"Fondos en silla",g:"Brazos",e:"Peso corporal",home:true,inc:0,rest:60,c:["Manos en el borde de una silla firme, piernas al frente.","Bajá doblando los codos hacia atrás hasta unos 90°.","Subí estirando los brazos.","Piernas dobladas = más fácil. Anotá 0 kg."],m:["Bajar demasiado: molesta el hombro."]}
   ,rueda:{n:"Rueda abdominal",g:"Core",e:"Rueda",inc:0,rest:60,c:["De rodillas, manos en la rueda debajo de los hombros.","Abdomen apretado y cola metida.","Rodá hacia adelante hasta donde controles sin hundir la cadera.","Volvé tirando con el abdomen."],m:["Hundir la zona lumbar."]}
 };
 const GROUPS=["Pecho","Espalda","Hombros","Brazos","Piernas","Core","Cardio"];
@@ -488,7 +528,7 @@ const VAR_GROUPS=[
   ["press_incl_manc","press_incl_barra","press_manc","press_suelo","press_maquina"],
   ["cruces_polea","aperturas","aperturas_incl","pec_deck","press_polea"],
   ["fondos","flexiones","fondos_tri","press_polea"],
-  ["flexiones","fondos","press_polea"],
+  ["flexiones","fondos","press_polea","press_suelo_alt","fondos_banco"],
   ["dominadas","jalon","chin_up","jalon_cerrado"],
   ["jalon","jalon_cerrado","chin_up","dominadas"],
   ["remo_barra","remo_t","remo_dos_manc","remo_supino","remo_manc","remo_incl_manc"],
@@ -520,14 +560,56 @@ const VAR_GROUPS=[
   ["plancha","plancha_lateral","escaladores","cuerdas"],
   ["escaladores","cuerdas","plancha","plancha_lateral"],["cuerdas","escaladores","plancha_lateral","plancha"],["plancha_lateral","plancha","cuerdas","escaladores"],
   ["crunch_inverso","dead_bug","pallof","lenador","rueda"],
-  ["kb_swing","kb_thruster","kb_clean","salto_cajon"],
-  ["farmer","turkish"],
-  ...["cinta","bici","remo_ergo","eliptica","escaladora","bici_reclinada"].map((_,i,a)=>[...a.slice(i),...a.slice(0,i)])
+  ["kb_swing","kb_thruster","kb_clean","kb_dead_clean","salto_cajon"],
+  ["press_kb","kb_arnold","kb_seesaw","press_kb_dos","kb_push_press1"],
+  ["kb_push_press1","press_kb","kb_push_press","kb_arnold","kb_seesaw"],
+  ["press_suelo_kb","press_suelo_alt","flexiones","fondos_banco"],
+  ["remo_kb","remo_kb_dos","remo_alt_kb","renegade","remo_manc"],
+  ["renegade","remo_alt_kb","remo_kb","remo_kb_dos"],
+  ["kb_high_pull","kb_pirata","kb_hang_clean","remo_menton_manc"],
+  ["kb_pirata","kb_high_pull","kb_arnold"],
+  ["curl_kb","curl_martillo_kb","curl_manc","zottman"],
+  ["triceps_kb","press_frances_kb","fondos_banco","triceps_manc"],
+  ["zancada_kb","lunge_pass","step_up_kb","zancadas"],
+  ["step_up_kb","zancada_kb","lunge_pass","step_up"],
+  ["lunge_pass","zancada_kb","step_up_kb"],
+  ["pm_una_pierna","pm_kb","kb_dead_clean","pm_manc"],
+  ["pm_kb","pm_una_pierna","kb_dead_clean"],
+  ["kb_clean1","kb_hang_clean","kb_dead_clean","kb_clean","kb_snatch"],
+  ["turkish","kb_windmill","kb_figura8"],
+  ["kb_windmill","turkish","kb_figura8","giro_ruso"],
+  ["kb_figura8","kb_pass","giro_ruso","kb_windmill"],
+  ["gemelos_kb","gemelos_manc"],
+  ["puente_una_pierna","glute_bridge","hip_thrust"],
+  ["farmer","suitcase","turkish"],
+  ...["cinta","bici","remo_ergo","eliptica","escaladora","bici_reclinada"].map((_,i,a)=>[...a.slice(i),...a.slice(0,i)]),
+  ...["salto_soga","emom_kb","star_jump","circuito_kb"].map((_,i,a)=>[...a.slice(i),...a.slice(0,i)])
 ];
 const VAR_OF={};for(const g of VAR_GROUPS)if(!VAR_OF[g[0]])VAR_OF[g[0]]=g;
 // Pesas libres: barra, mancuernas o kettlebell
 const isFree=id=>{const e=LIB[id]?.e||"";return /barra|mancuerna|kettlebell/i.test(e)&&!/máquina|polea/i.test(e)};
 const freeOn=()=>state.plan.free!==false;
+const modeOf=()=>state.plan.mode||"gym";
+const homeOK=id=>{const L=LIB[id];return !!L&&(L.home===true||/kettlebell/i.test(L.e||""))};
+const isKB=id=>/kettlebell/i.test(LIB[id]?.e||"");
+const KB_OPTIONS=[4,6,8,10,12,14,16,18,20,22,24,28,32,36,40,48];
+const myKbs=()=>{const k=state.kbs;return Array.isArray(k)&&k.length?[...k].sort((a,b)=>a-b):[8,12,16,20,24]};
+const kbMode=id=>modeOf()==="casa"&&isKB(id);
+function kbNext(w,dir){const ks=myKbs();if(dir>0)return ks.find(k=>k>w+0.01)??null;const lower=ks.filter(k=>k<w-0.01);return lower.length?lower[lower.length-1]:null}
+function kbFloor(w){const ks=myKbs();const lower=ks.filter(k=>k<=w+0.01);return lower.length?lower[lower.length-1]:ks[0]}
+function switchMode(m){
+  if(m===modeOf())return;
+  if(state.draft){toast("Terminá o descartá el entreno en curso antes de cambiar");return}
+  const other=lsGet("gym.planOther");lsSet("gym.planOther",state.plan);
+  const g=state.plan.goal||"musculo";
+  state.plan=other&&(other.mode||"gym")===m?other:(m==="casa"?buildPlan("kb3",g):buildPlan("tl4",g));
+  savePlanNow();render();window.scrollTo(0,0);
+  toast(m==="casa"?"Modo Casa: rutina con kettlebells":"Modo Gym");
+}
+function modeSwitchHTML(){const m=modeOf();
+  return `<div class="modesw" role="tablist" aria-label="Dónde entrenás">
+    <button role="tab" class="${m==="gym"?"on":""}" data-act="mode" data-k="gym" aria-selected="${m==="gym"}"><svg viewBox="0 0 24 24"><path d="M3 10v4M6 7v10M18 7v10M21 10v4M6 12h12"/></svg>Gym</button>
+    <button role="tab" class="${m==="casa"?"on":""}" data-act="mode" data-k="casa" aria-selected="${m==="casa"}"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7M5 10v10h14V10"/><circle cx="12" cy="15" r="2.5"/></svg>Casa · Kettlebell</button></div>`}
 const LETTERS="1234";
 // Nombre del día con el número de variante: "Full body A" + variante 2 = "Full body A2"
 function dayLabel(day,w){const vw=varyWeek();if(!vw)return day.name;const n=(w??vw.i)+1;return /\s[A-Z]$/.test(day.name)?day.name+n:`${day.name} · ${n}`}
@@ -546,13 +628,22 @@ const DAY={
   piA:["Pierna A",[["sentadilla",4,6,8],["peso_muerto_rumano",3,8,10],["prensa",3,10,12],["curl_femoral",3,10,12],["extension_cuad",2,12,15],["gemelos",4,12,15]]],
   emB:["Empuje B",[["press_militar",4,6,8],["press_incl_manc",3,8,12],["cruces_polea",3,12,15],["elev_lat",4,12,15],["press_frances",3,10,12],["triceps_polea",2,12,15]]],
   tiB:["Tirón B",[["peso_muerto",3,4,6],["jalon",3,10,12],["remo_manc",3,8,12],["face_pull",3,12,15],["curl_martillo",3,10,12],["crunch_polea",3,12,15],["farmer",3,30,45]]],
+  kbA:["Kettlebell A",[["goblet",4,8,12],["press_kb",3,6,10],["remo_kb",3,8,12],["kb_swing",4,15,20],["curl_kb",2,10,15],["plancha",3,30,60]]],
+  kbB:["Kettlebell B",[["pm_una_pierna",3,8,10],["press_suelo_kb",3,8,12],["renegade",3,6,10],["zancada_kb",3,8,12],["triceps_kb",2,10,15],["kb_windmill",3,5,8]]],
+  kbC:["Kettlebell C",[["kb_clean1",4,5,8],["step_up_kb",3,8,12],["kb_push_press1",3,6,8],["kb_high_pull",3,10,15],["turkish",3,2,3],["farmer",3,30,45]]],
+  kbTA:["KB Torso A",[["press_kb",4,6,10],["remo_kb",4,8,12],["press_suelo_kb",3,8,12],["kb_high_pull",3,10,15],["curl_kb",3,10,15],["triceps_kb",3,10,15]]],
+  kbPA:["KB Pierna A",[["goblet",4,8,12],["kb_swing",4,15,20],["zancada_kb",3,8,12],["pm_una_pierna",3,8,10],["gemelos_kb",3,12,20],["plancha",3,30,60]]],
+  kbTB:["KB Torso B",[["kb_push_press1",4,6,8],["renegade",3,6,10],["flexiones",3,8,15],["kb_pirata",3,8,12],["kb_windmill",3,5,8],["kb_figura8",3,10,16]]],
+  kbPB:["KB Pierna B",[["kb_clean1",4,5,8],["step_up_kb",3,8,12],["puente_una_pierna",3,10,15],["lunge_pass",3,8,12],["turkish",3,2,3],["farmer",3,30,45]]],
   piB:["Pierna B",[["zancada_bulgara",3,8,10],["hip_thrust",3,8,12],["prensa",3,12,15],["curl_femoral",3,12,15],["gemelos",4,12,15],["elev_piernas",3,10,15]]]
 };
 const PLANS=[
   {key:"fb3",name:"Full body",dpw:3,desc:"Todo el cuerpo en cada sesión. Ideal si vas 3 veces por semana (lun-mié-vie).",days:["fbA","fbB","fbC"]},
   {key:"ppl3",name:"Empuje · Tirón · Pierna",dpw:3,desc:"Cada día un grupo: pecho/hombro/tríceps, espalda/bíceps, piernas. Más volumen por músculo.",days:["emA","tiA","piA"]},
   {key:"tl4",name:"Torso · Pierna",dpw:4,desc:"Dos de torso y dos de pierna por semana. Buen equilibrio entre volumen y descanso.",days:["tA","pA","tB","pB"]},
-  {key:"ppl6",name:"Empuje · Tirón · Pierna ×2",dpw:6,desc:"Cada músculo dos veces por semana con variantes A y B. Para cuando vas casi todos los días.",days:["emA","tiA","piA","emB","tiB","piB"]}
+  {key:"ppl6",name:"Empuje · Tirón · Pierna ×2",dpw:6,desc:"Cada músculo dos veces por semana con variantes A y B. Para cuando vas casi todos los días.",days:["emA","tiA","piA","emB","tiB","piB"]},
+  {key:"kb3",mode:"casa",name:"Kettlebell full body",dpw:3,desc:"Todo el cuerpo en cada sesión, solo con kettlebells. Ideal 3 veces por semana en casa.",days:["kbA","kbB","kbC"]},
+  {key:"kb4",mode:"casa",name:"Kettlebell torso · pierna",dpw:4,desc:"Dos días de torso y dos de pierna con kettlebells. Más volumen por músculo.",days:["kbTA","kbPA","kbTB","kbPB"]}
 ];
 const GOALS={
   musculo:{n:"Ganar músculo",d:"Pesos medios a 6–15 reps y descansos de 1–2,5 min. El clásico para crecer."},
@@ -560,12 +651,13 @@ const GOALS={
   grasa:{n:"Bajar grasa",d:"Fuerza a 8–15 reps con descansos cortos, un bloque intenso y cardio al final."},
   tono:{n:"Tonificar",d:"Más reps (12–15), mancuernas y máquinas, plancha y cardio corto."}
 };
-const MAIN=new Set(["press_banca","sentadilla","peso_muerto","press_militar","remo_barra","dominadas"]);
-const COMP2=new Set(["peso_muerto_rumano","press_incl_manc","prensa","hip_thrust","zancada_bulgara","fondos","jalon","remo_polea","remo_manc","press_hombro_manc","goblet","zancadas"]);
-const CARDIO=["cinta","bici","remo_ergo","eliptica","escaladora","bici_reclinada"];
+const MAIN=new Set(["press_banca","sentadilla","peso_muerto","press_militar","remo_barra","dominadas","press_kb","kb_push_press1","kb_clean1"]);
+const COMP2=new Set(["peso_muerto_rumano","press_incl_manc","prensa","hip_thrust","zancada_bulgara","fondos","jalon","remo_polea","remo_manc","press_hombro_manc","goblet","zancadas","remo_kb","pm_una_pierna","zancada_kb","step_up_kb","press_suelo_kb","renegade"]);
+const HOME_CARDIO=["salto_soga","emom_kb","star_jump","circuito_kb"];
+const CARDIO_GYM=["cinta","bici","remo_ergo","eliptica","escaladora","bici_reclinada"];
 const TONO_SUB={sentadilla:"goblet",peso_muerto:"peso_muerto_rumano",press_militar:"press_hombro_manc",remo_barra:"remo_manc",fondos:"flexiones",dominadas:"jalon",zancada_bulgara:"zancadas"};
-function applyGoal(exs,goal,di){
-  const base=exs.map(e=>({...e}));
+function applyGoal(exs,goal,di,mode){
+  const base=exs.map(e=>({...e}));const CARDIO=mode==="casa"?HOME_CARDIO:CARDIO_GYM;
   if(goal==="fuerza")return [...base.slice(0,5),...(base.slice(5).some(e=>e.id==="farmer")?[{id:"farmer",sets:3,lo:20,hi:30,rest:120}]:[])].map(e=>e.id==="farmer"?e:MAIN.has(e.id)?{...e,sets:5,lo:3,hi:5,rest:180}:COMP2.has(e.id)?{...e,sets:3,lo:6,hi:8,rest:120}:{...e,sets:3,lo:8,hi:10,rest:90});
   if(goal==="grasa"){
     const st=base.slice(0,4).map(e=>(MAIN.has(e.id)||COMP2.has(e.id))?{...e,sets:3,lo:8,hi:12,rest:75}:{...e,sets:3,lo:12,hi:15,rest:60});
@@ -579,7 +671,7 @@ function applyGoal(exs,goal,di){
   }
   return base;
 }
-function buildPlan(key,goal){const g=goal||"musculo";const p=PLANS.find(p=>p.key===key)||PLANS[2];return {key:p.key,goal:g,name:p.name,days:p.days.map((k,i)=>({id:"d"+(i+1)+k,name:DAY[k][0],ex:applyGoal(mk(DAY[k][1]),g,i)}))}}
+function buildPlan(key,goal){const g=goal||"musculo";const p=PLANS.find(p=>p.key===key)||PLANS[2];const mode=p.mode||"gym";return {key:p.key,mode,goal:g,name:p.name,days:p.days.map((k,i)=>({id:"d"+(i+1)+k,name:DAY[k][0],ex:applyGoal(mk(DAY[k][1]),g,i,mode)}))}}
 const DEFAULT_PLAN=(()=>{const p=buildPlan("tl4");delete p.goal;return p})();
 
 // ---------- Utilidades ----------
@@ -640,16 +732,16 @@ const Cloud={
   async signUp(email,password){const j=await this.api("/auth/v1/signup",{method:"POST",auth:false,body:{email,password}});
     if(!j||!j.access_token){await this.signIn(email,password);return}this.saveSess(j)},
   async logout(){try{await this.api("/auth/v1/logout",{method:"POST"})}catch(e){}this.sess=null;this.status="off";lsSet("gym.lastSync",null)},
-  localDoc(){return {v:1,plan:state.plan,cycle:state.cycle||null,vary:state.vary||null,settingsAt:lsGet("gym.settingsAt")||0,sessions:state.sessions,deleted:lsGet("gym.deleted")||[]}},
+  localDoc(){return {v:1,plan:state.plan,planOther:lsGet("gym.planOther")||null,kbs:state.kbs||null,cycle:state.cycle||null,vary:state.vary||null,settingsAt:lsGet("gym.settingsAt")||0,sessions:state.sessions,deleted:lsGet("gym.deleted")||[]}},
   merge(L,C){
     if(!C)return L;
     const useC=(C.settingsAt||0)>(L.settingsAt||0);
     const del=[...new Set([...(L.deleted||[]),...(C.deleted||[])])];const ds=new Set(del);
     const byId=new Map();for(const s of [...(C.sessions||[]),...(L.sessions||[])])if(s&&s.id&&!ds.has(s.id))byId.set(s.id,s);
     const S=useC?C:L;
-    return {v:1,plan:S.plan||L.plan,cycle:S.cycle??null,vary:S.vary??null,settingsAt:Math.max(L.settingsAt||0,C.settingsAt||0),sessions:[...byId.values()],deleted:del.slice(-500)}},
+    return {v:1,plan:S.plan||L.plan,planOther:S.planOther??L.planOther??null,kbs:S.kbs??L.kbs??null,cycle:S.cycle??null,vary:S.vary??null,settingsAt:Math.max(L.settingsAt||0,C.settingsAt||0),sessions:[...byId.values()],deleted:del.slice(-500)}},
   apply(D){
-    state.plan=D.plan;state.cycle=D.cycle;state.vary=D.vary;state.sessions=D.sessions;sortSessions();
+    state.plan=D.plan;state.cycle=D.cycle;state.vary=D.vary;state.kbs=D.kbs;state.sessions=D.sessions;sortSessions();lsSet("gym.planOther",D.planOther);lsSet("gym.kbs",D.kbs);
     lsSet("gym.plan",D.plan);lsSet("gym.cycle",D.cycle);lsSet("gym.vary",D.vary);lsSet("gym.sessions",state.sessions);lsSet("gym.deleted",D.deleted);lsSet("gym.settingsAt",D.settingsAt)},
   soon(ms){if(!this.on)return;clearTimeout(this.timer);this.timer=setTimeout(()=>this.sync(),ms??2000)},
   async sync(){
@@ -690,6 +782,7 @@ const state={
   draft:lsGet("gym.draft"),
   cycle:lsGet("gym.cycle"),
   vary:lsGet("gym.vary"),
+  kbs:lsGet("gym.kbs"),
   auth:{step:"email"},
   tab:"train", importData:null, sheet:null, confirmFinish:false, confirmDel:null, confirmPlan:null, confirmGoal:null, rest:null
 };
@@ -707,7 +800,7 @@ function varyWeek(){const v=state.vary;if(!v||!v.on||!v.n)return null;
 // Ejercicios de toda la semana: rota variantes y evita repetir el mismo ejercicio en días distintos
 const weekCache=new Map();
 function resolveWeek(w){
-  const v=state.vary;const key=w+"|"+JSON.stringify(state.plan.days.map(d=>[d.id,d.ex.map(e=>e.id)]))+"|"+(v&&v.on&&v.keepMain?1:0)+"|"+(freeOn()?1:0);
+  const v=state.vary;const key=w+"|"+JSON.stringify(state.plan.days.map(d=>[d.id,d.ex.map(e=>e.id)]))+"|"+(v&&v.on&&v.keepMain?1:0)+"|"+(freeOn()?1:0)+"|"+modeOf();
   if(weekCache.has(key))return weekCache.get(key);
   const used=new Set(),out={};
   // primero los fijos (básicos con "mantener fijos"): su primera aparición queda fija, así nadie les roba el lugar
@@ -719,11 +812,11 @@ function resolveWeek(w){
       let id=e.id;
       if(g0&&!fixed){
         // con "priorizar pesas libres", si el grupo tiene opciones con pesas, solo se usan esas
-        const fr=freeOn()?g0.filter(isFree):[];const g=fr.length?fr:g0;
+        const fr=modeOf()==="casa"?g0.filter(homeOK):(freeOn()?g0.filter(isFree):[]);const g=fr.length?fr:g0;
         const start=w%g.length;let pick=null;
         for(let k=0;k<g.length;k++){const c=g[(start+k)%g.length];if(!used.has(c)&&LIB[c]){pick=c;break}}
         // si ya se usaron todas las versiones con pesas, recién ahí una máquina antes que repetir
-        if(!pick&&g!==g0){const s2=w%g0.length;for(let k=0;k<g0.length;k++){const c=g0[(s2+k)%g0.length];if(!used.has(c)&&LIB[c]){pick=c;break}}}
+        if(!pick&&g!==g0&&modeOf()!=="casa"){const s2=w%g0.length;for(let k=0;k<g0.length;k++){const c=g0[(s2+k)%g0.length];if(!used.has(c)&&LIB[c]){pick=c;break}}}
         id=pick||g[start];
       }
       used.add(id);
@@ -746,12 +839,15 @@ function suggest(exId,n,lo,hi,phase){
   let last=lastFor(exId,phase);
   const lastTxt=L=>L?(std?`Última: ${fmtKg(Math.max(...L.sets.map(x=>x.w)))} kg × ${L.sets.map(x=>x.r).join("·")} · `:`Última: ${L.sets.map(x=>x.r).join("·")} ${u} · `):"";
   if(!last&&phase&&std){const any=lastFor(exId);if(any){
-    const e1=Math.max(...any.sets.map(s=>(s.w||0)*(1+s.r/30)));const inc=lib.inc||2.5;const w=Math.max(0,Math.floor(e1/(1+((lo+hi)/2)/30)/inc)*inc);
+    const e1=Math.max(...any.sets.map(s=>(s.w||0)*(1+s.r/30)));const inc=lib.inc||2.5;let w=Math.max(0,Math.floor(e1/(1+((lo+hi)/2)/30)/inc)*inc);if(kbMode(exId))w=kbFloor(w);
     return {kind:"est",w,reps:Array(n).fill(lo),text:`Semana nueva: probá ${fmtKg(w)} kg para ${lo}–${hi} reps (calculado con tus marcas)`,short:`hoy ~${fmtKg(w)} kg`,lastTxt:lastTxt(any),last:any}}}
   if(!last)return {kind:"new",w:"",reps:Array(n).fill(lo),text:std?`Primera vez: elegí un peso con el que llegues a ${hi} reps con buena técnica`:`Primera vez: apuntá a ${lo}–${hi} ${u}`,short:"primera vez",lastTxt:"",last:null};
   const W=Math.max(...last.sets.map(s=>s.w||0));
   const top=last.sets.filter(s=>(s.w||0)===W);
   if(top.length>=n&&top.every(s=>s.r>=hi)){
+    if(kbMode(exId)&&std){const nk=kbNext(W,1);
+      if(nk!=null)return {kind:"up",w:nk,reps:Array(n).fill(lo),text:`Llegaste a ${hi} en todas: pasá a la kettlebell de ${fmtKg(nk)} kg`,short:`hoy ${fmtKg(nk)} kg`,lastTxt:lastTxt(last),last};
+      return {kind:"up",w:W,reps:Array(n).fill(hi),text:`Ya usás tu kettlebell más pesada: sumá una serie o bajá en 3 segundos cada rep`,short:"sumá una serie",lastTxt:lastTxt(last),last}}
     if(lib.inc>0){const nw=Math.round((W+lib.inc)*4)/4;
       return {kind:"up",w:nw,reps:Array(n).fill(lo),text:std?`Llegaste a ${hi} en todas: subí a ${fmtKg(nw)} kg`:`Llegaste a ${hi} ${u}: subí ${u0} a ${fmtKg(nw)}`,short:std?`hoy ${fmtKg(nw)} kg`:`hoy ${u0} ${fmtKg(nw)}`,lastTxt:lastTxt(last),last}}
     return {kind:"up",w:W,reps:Array(n).fill(hi),text:std?`Ya hacés ${hi} reps: sumá lastre o pasá a una variante más difícil`:`Ya llegás a ${hi} ${u}: probá una variante más difícil o sumá peso`,short:"subí la dificultad",lastTxt:lastTxt(last),last}}
@@ -794,7 +890,7 @@ window.addEventListener("popstate",()=>{
 });
 function nextDay(){
   const days=state.plan.days;if(!days.length)return null;
-  const last=state.sessions[0];if(!last)return days[0];
+  const ids=new Set(days.map(d=>d.id));const last=state.sessions.find(s=>ids.has(s.dayId));if(!last)return days[0];
   const i=days.findIndex(d=>d.id===last.dayId);
   return days[(i+1)%days.length]||days[0];
 }
@@ -807,6 +903,7 @@ function viewHome(){
   const lastDone=id=>{const s=state.sessions.find(s=>s.dayId===id);return s?fmtDate(s.date):"Nunca"};
   return `
   ${header(new Date().toLocaleDateString("es-AR",{weekday:"long",day:"numeric",month:"long"}),"Libreta de gym")}
+  ${state.draft?"":modeSwitchHTML()}
   ${Cloud.ready&&!Cloud.on?`<section class="hero cloudcta" style="margin-bottom:12px"><div><div class="eyebrow">Tus datos están solo en este iPhone</div><h3>Guardalos en tu cuenta</h3></div><div class="note">Con tu mail y una contraseña se sincronizan solos. Si borrás la app o cambiás de teléfono, no perdés nada.</div><button class="btn primary full" data-act="goauth">Crear mi cuenta</button></section>`:""}
   <div class="stats">
     <div class="stat"><b class="num">${thisWeek}</b><span>entrenos esta semana</span></div>
@@ -818,7 +915,7 @@ function viewHome(){
   ${!state.plan.goal?`<section class="hero" style="margin-top:12px"><div><div class="eyebrow">Primero lo primero</div><h2>¿Cuál es tu meta?</h2></div><div class="note">Arma tu rutina con los ejercicios, series, reps y descansos que corresponden. Lo podés cambiar cuando quieras en Rutina.</div>
     <div class="goals">${Object.entries(GOALS).map(([k,g])=>`<button class="goal" data-act="goal-yes" data-k="${k}"><b>${g.n}</b><span>${esc(g.d)}</span></button>`).join("")}</div></section>`:""}
   ${nd&&!state.draft?(()=>{const cw=cycleWeek();return `<section class="hero" style="margin-top:12px">
-    <div class="row between" style="align-items:flex-start"><div><div class="eyebrow">Hoy toca · ${esc(state.plan.name||"Tu rutina")} · ${esc(GOALS[goalOf()].n)}</div><h2>${esc(dayLabel(nd))}</h2></div><button class="btn sm ghost" data-act="tab" data-k="plan">Cambiar</button></div>
+    <div class="row between" style="align-items:flex-start"><div><div class="eyebrow">Hoy toca${modeOf()==="casa"?" en casa":""} · ${esc(state.plan.name||"Tu rutina")} · ${esc(GOALS[goalOf()].n)}</div><h2>${esc(dayLabel(nd))}</h2></div><button class="btn sm ghost" data-act="tab" data-k="plan">Cambiar</button></div>
     ${cw||varyWeek()?`<div class="row" style="flex-wrap:wrap;gap:6px">${cw?`<span class="chip est">Semana ${cw.i+1} de ${cw.total} · ${esc(cw.n||"")} · ${cw.lo}–${cw.hi} reps</span>`:""}${varyWeek()?`<span class="chip new">Ejercicios: variante ${varyWeek().letter} de ${varyWeek().n}</span>`:""}</div>`:""}
     <ul class="exlist">${resolveDay(nd).map(e=>{const p=rx(e);const g=suggest(e.id,e.sets,p.lo,p.hi,cw&&isStd(e.id)?cw.id:null);
       return `<li><button class="row grow" data-act="info" data-id="${e.id}" style="text-align:left;align-items:center">${thumb(e.id,"sm")}<span class="grow"><span style="display:block;font-weight:600">${esc(exName(e.id))}</span><span class="sg ${g.kind} num">${esc(g.lastTxt)}${esc(g.short)}</span></span></button><span class="sx num">${e.sets} × ${p.lo}${p.hi!==p.lo?"–"+p.hi:""}${isStd(e.id)?"":" "+COLS(e.id)[1]}</span></li>`}).join("")}</ul>
@@ -826,7 +923,7 @@ function viewHome(){
   </section>`})():(!nd?`<p class="muted">No tenés días en la rutina. Armá uno en la pestaña Rutina.</p>`:"")}
   ${state.draft?"":`<div style="margin-top:22px" class="eyebrow">Otro día</div>
   <div>${days.filter(d=>d!==nd).map(d=>`<div class="daycard"><div class="grow"><h3>${esc(dayLabel(d))}</h3><div class="note">${d.ex.length} ejercicios · último: ${lastDone(d.id)}</div></div><button class="btn sm" data-act="start" data-id="${d.id}">Empezar</button></div>`).join("")}</div>`}
-  <p class="note" style="margin-top:18px">Versión 18 oct. Fotos: free-exercise-db (dominio público). Usala siempre desde el ícono de la pantalla de inicio: ahí quedan guardados tus datos.</p>`;
+  <p class="note" style="margin-top:18px">Versión 26 oct · Casa. Fotos: free-exercise-db (dominio público). Usala siempre desde el ícono de la pantalla de inicio: ahí quedan guardados tus datos.</p>`;
 }
 
 function startWorkout(dayId){
@@ -879,7 +976,7 @@ function finishWorkout(){
   const entries=d.ex.map(e=>({id:e.id,sets:e.sets.filter(s=>s.done).map(s=>({w:num(s.w)??0,r:Math.round(num(s.r)??0)})).filter(s=>s.r>0)})).filter(e=>e.sets.length);
   if(!entries.length){discardWorkout();toast("No había series marcadas, no se guardó nada");return}
   let prs=0;for(const e of entries){if(!isStd(e.id))continue;const b=bestWeight(e.id);const top=Math.max(...e.sets.map(s=>s.w));if(b!==null&&top>b)prs++}
-  var s={id:uid("s"),date:new Date().toISOString(),dayId:d.dayId,dayName:d.dayName,cyc:d.cyc||null,min:Math.round((Date.now()-new Date(d.startedAt))/60000),entries};
+  var s={id:uid("s"),date:new Date().toISOString(),mode:modeOf(),dayId:d.dayId,dayName:d.dayName,cyc:d.cyc||null,min:Math.round((Date.now()-new Date(d.startedAt))/60000),entries};
   state.sessions.unshift(s);sortSessions();
   state.draft=null;state.rest=null;state.confirmFinish=false;state.inWorkout=false;
   try{if(history.state&&history.state.v==="w")history.replaceState({v:"home"},"")}catch(e){}
@@ -900,12 +997,16 @@ function discardWorkout(){state.draft=null;state.rest=null;state.confirmFinish=f
 function roundTo(x,inc){inc=inc||2.5;return Math.max(0,Math.round(x/inc)*inc)}
 function warmupItems(d){
   const groups=new Set(d.ex.map(e=>LIB[e.id]?.g));const legs=groups.has("Piernas"),upper=["Pecho","Espalda","Hombros","Brazos"].some(g=>groups.has(g));
-  const it=["5 min de cardio suave (bici, cinta o remo) hasta entrar en calor"];
+  const home=modeOf()==="casa";
+  const it=[home?"3–5 min de salto de soga, saltos de estrella o trote en el lugar":"5 min de cardio suave (bici, cinta o remo) hasta entrar en calor"];
+  if(home)it.push("10 swings livianos o 10 halos con la kettlebell más liviana");
   if(legs)it.push("10 sentadillas sin peso, lentas y profundas","10 puentes de glúteo en el piso","10 balanceos de pierna por lado");
   if(upper)it.push("10 círculos de brazos para cada lado","15 face pulls o separaciones con banda, livianos","8–10 flexiones (o con rodillas apoyadas)");
   if(!legs&&!upper)it.push("2 min de movilidad general (cadera, hombros, columna)");
   const first=d.ex.find(e=>isStd(e.id)&&LIB[e.id]&&!LIB[e.id].cardio&&(LIB[e.id].inc||0)>0);
-  if(first){const W=num(first.sets[0]?.w);const inc=LIB[first.id].inc;
+  if(first&&kbMode(first.id)){const W=num(first.sets[0]?.w);const lighter=W?kbNext(W,-1):null;
+    it.push(`Aproximación en ${exName(first.id)}: ${lighter?`1–2 series de 5 con la de ${fmtKg(lighter)} kg`:"1–2 series livianas de 5 reps"} antes de la primera serie de trabajo`)}
+  else if(first){const W=num(first.sets[0]?.w);const inc=LIB[first.id].inc;
     if(W&&W>=10){const bar=LIB[first.id].e==="Barra"?20:0;
       const sets=[[.4,8],[.6,5],[.8,3]].map(([p,r])=>[Math.max(bar,roundTo(W*p,inc)),r]).filter(([x],i,a)=>x<W&&(i===0||x>a[i-1][0]));
       if(sets.length)it.push(`Aproximación en ${exName(first.id)}: `+sets.map(([x,r])=>`${fmtKg(x)} kg × ${r}`).join(" · ")+` (sin descanso largo)`);}
@@ -1021,7 +1122,7 @@ function sheetInfo(exId){
 function sheetPick(dayId){
   return `<div class="grab"></div>
   <button class="btn sm ghost backbtn" data-act="close">${ICON.back}Volver</button><h2 style="margin-top:6px">Agregar ejercicio</h2>
-  ${GROUPS.map(g=>`<div class="section" style="padding-bottom:0"><div class="eyebrow">${g}</div><div class="pick">${Object.entries(LIB).filter(([,v])=>v.g===g).map(([k,v])=>`<button data-act="pickex" data-day="${dayId}" data-id="${k}" style="align-items:center">${thumb(k,"sm")}<span class="grow">${esc(v.n)}<span class="note" style="display:block">${esc(v.e)}</span></span></button>`).join("")}</div></div>`).join("")}`;
+  ${GROUPS.map(g=>`<div class="section" style="padding-bottom:0"><div class="eyebrow">${g}</div><div class="pick">${Object.entries(LIB).filter(([k,v])=>v.g===g&&(modeOf()!=="casa"||homeOK(k))).map(([k,v])=>`<button data-act="pickex" data-day="${dayId}" data-id="${k}" style="align-items:center">${thumb(k,"sm")}<span class="grow">${esc(v.n)}<span class="note" style="display:block">${esc(v.e)}</span></span></button>`).join("")}</div></div>`).join("")}`;
 }
 const reduceMotion=()=>{try{return matchMedia("(prefers-reduced-motion: reduce)").matches}catch(e){return false}};
 let animId=0;
@@ -1060,7 +1161,7 @@ function viewHistory(){
   ${state.sessions.map(s=>{
     const vol=s.entries.reduce((a,e)=>a+(isStd(e.id)?e.sets.reduce((b,x)=>b+x.w*x.r,0):0),0);
     const sets=s.entries.reduce((a,e)=>a+e.sets.length,0);
-    return `<details class="sess"><summary><div><h3>${esc(s.dayName)}</h3><div class="note">${esc(fmtDate(s.date))} · ${s.min||0} min</div></div><div class="num" style="text-align:right"><b>${sets}</b> series<div class="note">${Math.round(vol).toLocaleString("es-AR")} kg</div></div></summary>
+    return `<details class="sess"><summary><div><h3>${esc(s.dayName)}</h3><div class="note">${esc(fmtDate(s.date))} · ${s.min||0} min${s.mode==="casa"?" · Casa":""}</div></div><div class="num" style="text-align:right"><b>${sets}</b> series<div class="note">${Math.round(vol).toLocaleString("es-AR")} kg</div></div></summary>
       <table>${s.entries.map(e=>`<tr><td><button data-act="info" data-id="${e.id}" style="text-align:left;text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px">${esc(exName(e.id))}</button></td><td class="num">${e.sets.map(x=>esc(fmtSet(e.id,x))).join("  ")}</td></tr>`).join("")}</table>
       ${state.confirmDel===s.id?`<div class="row" style="margin-top:10px"><span class="grow note">¿Borrar este entrenamiento?</span><button class="btn sm danger" data-act="delsess-yes" data-id="${s.id}">Borrar</button><button class="btn sm" data-act="delsess-no">No</button></div>`:`<button class="btn sm ghost muted" style="margin-top:8px" data-act="delsess" data-id="${s.id}">Borrar entrenamiento</button>`}
     </details>`}).join("")}`;
@@ -1069,13 +1170,15 @@ function viewHistory(){
 // ---------- Editor de rutina ----------
 function viewPlan(){
   const g=goalOf(),cy=state.cycle,cw=cycleWeek();
-  return `${header(`${state.plan.name||"Tu plan"} · ${GOALS[g].n}`,"Rutina")}
+  const home=modeOf()==="casa";
+  return `${header(`${home?"Casa · ":""}${state.plan.name||"Tu plan"} · ${GOALS[g].n}`,"Rutina")}
+  ${modeSwitchHTML()}
   ${Cloud.ready&&!Cloud.on?authHTML():""}
   <div class="eyebrow" style="margin-bottom:8px">Tu meta</div>
   <div class="goals">${Object.entries(GOALS).map(([k,v])=>`<button class="goal ${g===k&&state.plan.goal?"on":""}" data-act="choosegoal" data-k="${k}"><b>${v.n}</b><span>${esc(v.d)}</span></button>`).join("")}</div>
   ${state.confirmGoal?`<div class="confirm" style="margin-top:10px"><b>¿Rearmar tu rutina para ${esc(GOALS[state.confirmGoal].n)}?</b><span class="note">Cambian los ejercicios, series, reps y descansos de ${esc(state.plan.name||"tu plan")}. Los ajustes que hiciste a mano se reemplazan; tu historial queda.</span><div class="row"><button class="btn primary grow" data-act="goal-yes" data-k="${state.confirmGoal}">Rearmar</button><button class="btn grow" data-act="goal-no">Cancelar</button></div></div>`:""}
   <div class="eyebrow" style="margin:22px 0 8px">Elegí un plan</div>
-  <div class="plans">${PLANS.map(p=>`<button class="plan ${state.plan.key===p.key?"on":""}" data-act="chooseplan" data-k="${p.key}">
+  <div class="plans">${PLANS.filter(p=>(p.mode||"gym")===modeOf()).map(p=>`<button class="plan ${state.plan.key===p.key?"on":""}" data-act="chooseplan" data-k="${p.key}">
     <span class="d">${p.dpw} DÍAS POR SEMANA${state.plan.key===p.key?" · ACTUAL":""}</span><h3>${esc(p.name)}</h3><span class="note">${esc(p.desc)}</span><span class="note">${p.days.map(k=>esc(DAY[k][0])).join(" · ")}</span></button>
     ${state.confirmPlan===p.key?`<div class="confirm"><b>¿Cambiar a ${esc(p.name)}?</b><span class="note">Reemplaza los días de tu rutina actual. Tu historial y tus pesos se mantienen, así que la progresión sigue donde la dejaste.</span><div class="row"><button class="btn primary grow" data-act="plan-yes" data-k="${p.key}">Cambiar</button><button class="btn grow" data-act="plan-no">Cancelar</button></div></div>`:""}`).join("")}</div>
   <section class="section" style="margin-top:22px">
@@ -1085,13 +1188,17 @@ function viewPlan(){
     ${cy.weeks.map((w,i)=>`<div class="cweek ${cw.i===i?"on":""}"><span class="cn">S${i+1}</span><input id="cn-${i}" data-f="cname" data-i="${i}" value="${esc(w.n||"")}" aria-label="Nombre de la semana" class="ctext"><input id="cl-${i}" data-f="clo" data-i="${i}" inputmode="numeric" value="${w.lo}" aria-label="Reps mínimas"><span class="note">a</span><input id="ch-${i}" data-f="chi" data-i="${i}" inputmode="numeric" value="${w.hi}" aria-label="Reps máximas"><button class="icon" data-act="cyc-rm" data-i="${i}" aria-label="Quitar semana">${ICON.x}</button></div>`).join("")}
     <div class="row"><button class="btn sm grow" data-act="cyc-add">+ Agregar semana</button><button class="btn sm ghost grow" data-act="cyc-preset">Usar ejemplo 12·15·4·30</button></div>`:""}
   </section>
-  <section class="section">
+  ${home?`<section class="section"><h3>Mis kettlebells</h3>
+    <div class="note">Marcá las que tenés. La app solo te sugiere esos pesos: cuando llegás al máximo de reps te pasa a la siguiente, y los botones − / + saltan entre ellas.</div>
+    <div class="kbs">${KB_OPTIONS.map(k=>`<button class="kbchip ${myKbs().includes(k)?"on":""}" data-act="kb-toggle" data-k="${k}">${k} kg</button>`).join("")}</div>
+  </section>`:""}
+  <section class="section" ${home?"hidden":""}>
     <div class="row between"><h3>Priorizar pesas libres</h3><button class="btn sm ${freeOn()?"":"primary"}" data-act="free-toggle">${freeOn()?"Desactivar":"Activar"}</button></div>
     <div class="note">${freeOn()?"Activado: cuando un ejercicio tiene versión con barra, mancuernas o kettlebell, se usa esa en lugar de la máquina o la polea (por ejemplo remo en polea → remo con mancuerna, prensa → sentadilla con mancuernas). Lo que no tiene equivalente con pesas, como dominadas o jalón, queda igual.":"Desactivado: la rutina mezcla pesas libres, máquinas y poleas."}</div>
   </section>
   <section class="section">
     <div class="row between"><h3>Variar ejercicios cada semana</h3><button class="btn sm ${state.vary&&state.vary.on?"":"primary"}" data-act="vary-toggle">${state.vary&&state.vary.on?"Desactivar":"Activar"}</button></div>
-    <div class="note">Cada semana cada ejercicio cambia por una variante que trabaja el mismo músculo (por ejemplo press de banca → con mancuernas → inclinado → máquina). La variante 1 es tu rutina tal cual; el número aparece en el nombre del día (Full body A1, A2…). Cada variante guarda su propio historial de pesos.</div>
+    <div class="note">Cada semana cada ejercicio cambia por una variante que trabaja el mismo músculo ${home?"(por ejemplo press militar → press Arnold → press balancín → push press)":"(por ejemplo press de banca → con mancuernas → inclinado → máquina)"}. La variante 1 es tu rutina tal cual; el número aparece en el nombre del día (Full body A1, A2…). Cada variante guarda su propio historial de pesos.</div>
     ${state.vary&&state.vary.on?(()=>{const vw=varyWeek();return `<div class="confirm">
       <div class="row between"><button class="icon" data-act="vary-prev" aria-label="Variante anterior">${ICON.back}</button><div style="text-align:center"><div class="eyebrow">Esta semana</div><b>Variante ${vw.letter} de ${vw.n}</b></div><button class="icon" data-act="vary-next" aria-label="Variante siguiente" style="transform:scaleX(-1)">${ICON.back}</button></div>
       <div class="row" style="justify-content:center;gap:6px"><span class="note">Variantes:</span>${[2,3,4].map(n=>`<button class="btn sm ${vw.n===n?"primary":""}" data-act="vary-n" data-n="${n}">${n}</button>`).join("")}</div>
@@ -1181,6 +1288,8 @@ document.addEventListener("click",ev=>{
     case "goal-yes":{const fr=state.plan.free;state.plan=buildPlan(state.plan.key||"tl4",t.dataset.k);if(fr===false)state.plan.free=false}state.confirmGoal=null;savePlanNow();render();window.scrollTo(0,0);toast(`Rutina armada para ${GOALS[t.dataset.k].n}`);break;
     case "cyc-toggle":{const c=state.cycle||{weeks:clone(CYCLE_PRESET)};c.on=!c.on;if(c.on)c.start=mondayOf(new Date()).toISOString();state.cycle=c;saveCycle();render();toast(c.on?"Ciclo activado: arrancás en la semana 1":"Ciclo desactivado");break}
     case "cyc-prev":case "cyc-next":{const d=new Date(state.cycle.start);d.setDate(d.getDate()+(a==="cyc-next"?-7:7));state.cycle.start=d.toISOString();saveCycle();render();break}
+    case "mode":switchMode(t.dataset.k);break;
+    case "kb-toggle":{const k=+t.dataset.k;let ks=myKbs();ks=ks.includes(k)?ks.filter(x=>x!==k):[...ks,k];if(!ks.length){toast("Dejá al menos una kettlebell marcada");break}state.kbs=ks.sort((a,b)=>a-b);lsSet("gym.kbs",state.kbs);touchSettings();Cloud.soon();render();break}
     case "free-toggle":state.plan.free=!freeOn();savePlanNow();render();toast(freeOn()?"Priorizando pesas libres":"Mezcla de pesas, máquinas y poleas");break;
     case "vary-toggle":{const v=state.vary||{n:4,keepMain:false};v.on=!v.on;if(v.on)v.start=mondayOf(new Date()).toISOString();state.vary=v;saveVary();render();toast(v.on?`Variantes activadas: esta semana es la 1`:"Variantes desactivadas");break}
     case "vary-n":{state.vary.n=+t.dataset.n;saveVary();render();break}
@@ -1196,7 +1305,8 @@ document.addEventListener("click",ev=>{
       saveDraftNow();render();break}
     case "step":{const ei=+t.dataset.e,si=+t.dataset.s,e=D.ex[ei],L=LIB[e.id]||{};const inc=L.inc||(isStd(e.id)?2.5:1);
       const inp=document.getElementById("w-"+ei+"-"+si);const cur=num(inp?inp.value:e.sets[si].w)||0;
-      const nv=Math.max(0,Math.round((cur+(+t.dataset.d)*inc)*100)/100);const txt=String(nv).replace(".",",");
+      let nv=Math.max(0,Math.round((cur+(+t.dataset.d)*inc)*100)/100);
+      if(kbMode(e.id)&&isStd(e.id)){const k=kbNext(cur,+t.dataset.d);nv=k==null?cur:k}const txt=String(nv).replace(".",",");
       if(inp){inp.value=txt;inp.dispatchEvent(new Event("input",{bubbles:true}))}else{e.sets[si].w=txt;saveDraftSoon()}break}
     case "worktimer":unlockAudio();startWork(+t.dataset.e);break;
     case "work-done":finishWork();break;
