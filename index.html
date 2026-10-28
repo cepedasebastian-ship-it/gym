@@ -799,7 +799,10 @@ function migrateAll(){let ch=false;const np=migratePlan(state.plan);if(np!==stat
   if(ch&&typeof touchSettings==="function"){touchSettings()}return ch}
 migrateAll();
 // ---------- Ciclo semanal ----------
-const CYCLE_PRESET=[{n:"Base",lo:10,hi:12},{n:"Volumen",lo:13,hi:15},{n:"Pesada",lo:4,hi:6},{n:"Liviana",lo:25,hi:30}];
+const CYCLE_PRESET=[{n:"Base",lo:10,hi:12},{n:"Volumen",lo:15,hi:20},{n:"Fuerza",lo:8,hi:10},{n:"Resistencia",lo:20,hi:25},{n:"Pesada",lo:4,hi:6},{n:"Liviana",lo:25,hi:30}];
+// el ciclo viejo de 4 semanas (12·15·4–6·25–30) pasa al nuevo de 6, manteniendo en qué semana vas
+(()=>{const c=state.cycle;if(c&&Array.isArray(c.weeks)&&c.weeks.length===4&&c.weeks.map(w=>w.lo+"-"+w.hi).join()==="10-12,13-15,4-6,25-30"){
+  c.weeks=clone(CYCLE_PRESET);if(c.on){c.start=mondayOf(new Date()).toISOString()}lsSet("gym.cycle",c);touchSettings()}})();
 function mondayOf(d){const x=new Date(d);x.setHours(0,0,0,0);x.setDate(x.getDate()-((x.getDay()+6)%7));return x}
 function cycleWeek(){const c=state.cycle;if(!c||!c.on||!c.weeks||!c.weeks.length)return null;
   const w=Math.round(Math.round((mondayOf(new Date())-mondayOf(c.start))/864e5)/7);const L=c.weeks.length;const i=((w%L)+L)%L;
@@ -945,7 +948,7 @@ function viewHome(){
   </section>`})():(!nd?`<p class="muted">No tenés días en la rutina. Armá uno en la pestaña Rutina.</p>`:"")}
   ${state.draft?"":`<div style="margin-top:22px" class="eyebrow">Otro día</div>
   <div>${days.filter(d=>d!==nd).map(d=>`<div class="daycard"><div class="grow"><h3>${esc(dayLabel(d))}</h3><div class="note">${d.ex.length} ejercicios · último: ${lastDone(d.id)}</div></div><button class="btn sm" data-act="start" data-id="${d.id}">Empezar</button></div>`).join("")}</div>`}
-  <p class="note" style="margin-top:18px">Versión 28 oct · reps. Fotos: free-exercise-db (dominio público). Usala siempre desde el ícono de la pantalla de inicio: ahí quedan guardados tus datos.</p>`;
+  <p class="note" style="margin-top:18px">Versión 28 oct · ciclo 6 semanas. Fotos: free-exercise-db (dominio público). Usala siempre desde el ícono de la pantalla de inicio: ahí quedan guardados tus datos.</p>`;
 }
 
 function startWorkout(dayId){
@@ -1205,7 +1208,7 @@ function viewPlan(){
     ${state.confirmPlan===p.key?`<div class="confirm"><b>¿Cambiar a ${esc(p.name)}?</b><span class="note">Reemplaza los días de tu rutina actual. Tu historial y tus pesos se mantienen, así que la progresión sigue donde la dejaste.</span><div class="row"><button class="btn primary grow" data-act="plan-yes" data-k="${p.key}">Cambiar</button><button class="btn grow" data-act="plan-no">Cancelar</button></div></div>`:""}`).join("")}</div>
   <section class="section" style="margin-top:22px">
     <div class="row between"><h3>Ciclo semanal de reps</h3><button class="btn sm ${cy&&cy.on?"":"primary"}" data-act="cyc-toggle">${cy&&cy.on?"Desactivar":"Activar"}</button></div>
-    <div class="note">Cada semana cambia el rango de repeticiones de los ejercicios con peso (por ejemplo 12, después 15, una semana pesada a 4–6 y otra liviana a 25–30). La app calcula el peso para cada semana con tus marcas. Cardio y plancha siguen igual, y los básicos pesados (sentadilla, peso muerto, press de banca…) nunca pasan de 12. Solo los de aislamiento (curl, elevaciones, gemelos…) llegan a 25–30; el resto de los compuestos queda en 12–15.</div>
+    <div class="note">Cada semana cambia el rango de repeticiones de los ejercicios con peso (6 semanas: 10–12 · 15–20 · 8–10 · 20–25 · 4–6 · 25–30). La app calcula el peso para cada semana con tus marcas. Cardio y plancha siguen igual, y los básicos pesados (sentadilla, peso muerto, press de banca…) nunca pasan de 12. Solo los de aislamiento (curl, elevaciones, gemelos…) llegan a 25–30; el resto de los compuestos queda en 12–15.</div>
     ${cy&&cy.on?`<div class="confirm"><div class="row between"><button class="icon" data-act="cyc-prev" aria-label="Semana anterior">${ICON.back}</button><div style="text-align:center"><div class="eyebrow">Esta semana</div><b>Semana ${cw.i+1} de ${cw.total} · ${esc(cw.n||"")} · ${cw.lo}–${cw.hi} reps</b></div><button class="icon" data-act="cyc-next" aria-label="Semana siguiente" style="transform:scaleX(-1)">${ICON.back}</button></div></div>
     ${cy.weeks.map((w,i)=>`<div class="cweek ${cw.i===i?"on":""}"><span class="cn">S${i+1}</span><input id="cn-${i}" data-f="cname" data-i="${i}" value="${esc(w.n||"")}" aria-label="Nombre de la semana" class="ctext"><input id="cl-${i}" data-f="clo" data-i="${i}" inputmode="numeric" value="${w.lo}" aria-label="Reps mínimas"><span class="note">a</span><input id="ch-${i}" data-f="chi" data-i="${i}" inputmode="numeric" value="${w.hi}" aria-label="Reps máximas"><button class="icon" data-act="cyc-rm" data-i="${i}" aria-label="Quitar semana">${ICON.x}</button></div>`).join("")}
     <div class="row"><button class="btn sm grow" data-act="cyc-add">+ Agregar semana</button><button class="btn sm ghost grow" data-act="cyc-preset">Usar ejemplo 12·15·4·30</button></div>`:""}
