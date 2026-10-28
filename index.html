@@ -814,7 +814,7 @@ function varyWeek(){const v=state.vary;if(!v||!v.on||!v.n)return null;
 // Ejercicios de toda la semana: rota variantes y evita repetir el mismo ejercicio en días distintos
 const weekCache=new Map();
 function resolveWeek(w){
-  const v=state.vary;const key=w+"|"+JSON.stringify(state.plan.days.map(d=>[d.id,d.ex.map(e=>e.id)]))+"|"+(v&&v.on&&v.keepMain?1:0)+"|"+(freeOn()?1:0)+"|"+modeOf();
+  const v=state.vary;const key=w+"|"+JSON.stringify(state.plan.days.map(d=>[d.id,d.ex.map(e=>e.id)]))+"|"+(v&&v.on&&v.keepMain?1:0)+"|"+(freeOn()?1:0)+"|"+modeOf()+"|"+(cycleHigh()?1:0);
   if(weekCache.has(key))return weekCache.get(key);
   const used=new Set(),out={};
   // primero los fijos (básicos con "mantener fijos"): su primera aparición queda fija, así nadie les roba el lugar
@@ -836,17 +836,39 @@ function resolveWeek(w){
       used.add(id);
       return {...e,id,base:e.id}})}
   if(weekCache.size>40)weekCache.clear();
+  if(cycleHigh()){const all=new Set(Object.values(out).flat().map(e=>e.id));const m=modeOf();
+    for(const d of state.plan.days){const today=new Set(out[d.id].map(e=>e.id));
+      out[d.id]=out[d.id].map(e=>{const c=HR_OF[e.id];if(!c)return e;
+      const alt=HR_ALT[c][m==="casa"?"casa":"gym"].filter(x=>LIB[x]&&(m!=="casa"||homeOK(x)));
+      // primero uno que no se haya usado en la semana; si no hay, uno que no esté hoy
+      const pick=alt.find(x=>!all.has(x))||alt.find(x=>!today.has(x));if(!pick)return e;all.add(pick);today.add(pick);return {...e,id:pick,hr:e.id}})}}
   weekCache.set(key,out);return out}
 function resolveDay(day,w){if(w==null){const vw=varyWeek();w=vw?vw.i:0}const W=resolveWeek(w);return W[day.id]||day.ex.map(e=>({...e,base:e.id}))}
-// básicos pesados: nunca más de 12 reps (en semanas de 15 o 25–30 quedan en 10–12)
-const HEAVY=new Set(["sentadilla","sent_frontal","sent_smith","hack","peso_muerto","pm_sumo","pm_rigido","peso_muerto_rumano","good_morning","press_banca","press_incl_barra","press_militar","remo_barra","remo_t","remo_supino","zancada_barra","step_up_barra","hip_thrust","zancada_bulgara","sent_manc","pm_manc","dominadas","chin_up","fondos","prensa","press_cerrado","sent_frontal_kb","kb_clean1","kb_dead_clean","kb_hang_clean","kb_push_press","kb_push_press1","press_kb","press_kb_dos","kb_snatch","pm_kb","pm_una_pierna","renegade"]);
-// aislamiento: los únicos que llegan a 25–30 en la semana liviana; el resto de los compuestos queda en 12–15
-const ISO=new Set(["elev_lat","elev_lat_polea","elev_frontal","pajaros","pajaros_maquina","face_pull","remo_deltoides","curl_barra","curl_martillo","curl_incl","curl_scott","curl_z","curl_maquina","curl_concentrado","zottman","curl_manc","curl_kb","curl_martillo_kb","triceps_polea","triceps_nuca","triceps_maquina","triceps_manc","press_frances","press_frances_manc","triceps_kb","press_frances_kb","extension_cuad","curl_femoral","curl_fem_sent","gemelos","gemelos_sent","gemelos_prensa","gemelos_manc","gemelos_kb","abductor","aductor","patada_gluteo","aperturas","aperturas_incl","cruces_polea","pec_deck","encogimientos","shrug_barra","crunch_polea","giro_ruso","glute_bridge","puente_una_pierna","kb_swing","kb_high_pull","kb_pirata","kb_figura8","kb_pass","remo_menton_manc"]);
+// básicos pesados: no se hacen a más de 12 reps. En las semanas de 15–30 se cambian por otro del mismo músculo
+const HR_CAT={squat:["sentadilla","sent_frontal","sent_smith","sent_frontal_kb"],
+  hinge:["peso_muerto","pm_sumo","pm_rigido","peso_muerto_rumano","good_morning","kb_dead_clean","pm_una_pierna"],
+  lunge:["zancada_bulgara","zancada_barra","step_up_barra"],
+  chest:["press_banca","press_incl_barra"],tri:["press_cerrado","fondos"],
+  shoulder:["press_militar","press_kb","press_kb_dos","kb_push_press","kb_push_press1","kb_snatch"],
+  row:["remo_barra","remo_t","remo_supino","renegade"],vpull:["dominadas","chin_up"],
+  clean:["kb_clean1","kb_hang_clean"]};
+const HR_ALT={
+  squat:{gym:["prensa","hack","goblet","sent_manc","extension_cuad"],casa:["goblet","sent_libre","step_up_kb","zancada_kb"]},
+  hinge:{gym:["hiperext","pm_manc","curl_femoral","glute_bridge","curl_fem_sent","kb_swing"],casa:["kb_swing","pm_kb","puente_una_pierna"]},
+  lunge:{gym:["zancadas","step_up","zancada_atras","prensa"],casa:["zancada_kb","lunge_pass","step_up_kb","sent_libre"]},
+  chest:{gym:["press_maquina","press_manc","press_incl_manc","press_polea","aperturas","flexiones"],casa:["flexiones","press_suelo_alt","press_suelo_kb"]},
+  tri:{gym:["triceps_polea","triceps_maquina","triceps_manc","triceps_nuca"],casa:["triceps_kb","fondos_banco"]},
+  shoulder:{gym:["press_hombro_maq","press_hombro_manc","press_arnold","elev_lat"],casa:["kb_arnold","kb_seesaw","kb_pirata","kb_high_pull"]},
+  row:{gym:["remo_polea","remo_maquina","remo_manc","remo_incl_manc"],casa:["remo_alt_kb","remo_kb","remo_kb_dos","kb_high_pull"]},
+  vpull:{gym:["jalon","jalon_cerrado","pullover"],casa:["remo_alt_kb","kb_high_pull"]},
+  clean:{gym:["kb_swing","kb_high_pull","goblet"],casa:["kb_swing","kb_high_pull","goblet"]}};
+const HR_OF={};for(const [c,ids] of Object.entries(HR_CAT))ids.forEach(i=>HR_OF[i]=c);
+const HEAVY=new Set(Object.keys(HR_OF));
+const cycleHigh=()=>{const c=cycleWeek();return !!c&&c.hi>12};
 // ejercicios técnicos con reps fijas: el ciclo no los toca
 const NOCYCLE=new Set(["turkish","kb_windmill"]);
 function cycFor(id){const cw=cycleWeek();if(!cw||!isStd(id)||NOCYCLE.has(id))return null;
-  if(HEAVY.has(id)&&cw.hi>12){return {...cw,lo:10,hi:12,id:cw.id+"h"}}
-  if(!ISO.has(id)&&cw.hi>15){return {...cw,lo:12,hi:15,id:cw.id+"h"}}return cw}
+  if(HEAVY.has(id)&&cw.hi>12){return {...cw,lo:10,hi:12,id:cw.id+"h"}}return cw}
 const cycPhase=id=>{const c=cycFor(id);return c?c.id:null};
 function rx(e){const base=e.rest??LIB[e.id]?.rest??90;const cw=cycFor(e.id);
   if(cw){const rest=cw.hi<=6?Math.max(base,150):cw.lo>=20?Math.min(base,60):base;return {lo:cw.lo,hi:cw.hi,rest}}
@@ -943,12 +965,12 @@ function viewHome(){
     <div class="row between" style="align-items:flex-start"><div><div class="eyebrow">Hoy toca${modeOf()==="casa"?" en casa":""} · ${esc(state.plan.name||"Tu rutina")} · ${esc(GOALS[goalOf()].n)}</div><h2>${esc(dayLabel(nd))}</h2></div><button class="btn sm ghost" data-act="tab" data-k="plan">Cambiar</button></div>
     ${cw||varyWeek()?`<div class="row" style="flex-wrap:wrap;gap:6px">${cw?`<span class="chip est">Semana ${cw.i+1} de ${cw.total} · ${esc(cw.n||"")} · ${cw.lo}–${cw.hi} reps</span>`:""}${varyWeek()?`<span class="chip new">Ejercicios: variante ${varyWeek().letter} de ${varyWeek().n}</span>`:""}</div>`:""}
     <ul class="exlist">${resolveDay(nd).map(e=>{const p=rx(e);const g=suggest(e.id,e.sets,p.lo,p.hi,cycPhase(e.id));
-      return `<li><button class="row grow" data-act="info" data-id="${e.id}" style="text-align:left;align-items:center">${thumb(e.id,"sm")}<span class="grow"><span style="display:block;font-weight:600">${esc(exName(e.id))}</span><span class="sg ${g.kind} num">${esc(g.lastTxt)}${esc(g.short)}</span></span></button><span class="sx num">${e.sets} × ${p.lo}${p.hi!==p.lo?"–"+p.hi:""}${isStd(e.id)?"":" "+COLS(e.id)[1]}</span></li>`}).join("")}</ul>
+      return `<li><button class="row grow" data-act="info" data-id="${e.id}" style="text-align:left;align-items:center">${thumb(e.id,"sm")}<span class="grow"><span style="display:block;font-weight:600">${esc(exName(e.id))}</span>${e.hr?`<span class="note" style="display:block">En vez de ${esc(exName(e.hr))}: semana de reps altas</span>`:""}<span class="sg ${g.kind} num">${esc(g.lastTxt)}${esc(g.short)}</span></span></button><span class="sx num">${e.sets} × ${p.lo}${p.hi!==p.lo?"–"+p.hi:""}${isStd(e.id)?"":" "+COLS(e.id)[1]}</span></li>`}).join("")}</ul>
     <button class="btn primary full" data-act="start" data-id="${nd.id}">Empezar ${esc(dayLabel(nd))}</button>
   </section>`})():(!nd?`<p class="muted">No tenés días en la rutina. Armá uno en la pestaña Rutina.</p>`:"")}
   ${state.draft?"":`<div style="margin-top:22px" class="eyebrow">Otro día</div>
   <div>${days.filter(d=>d!==nd).map(d=>`<div class="daycard"><div class="grow"><h3>${esc(dayLabel(d))}</h3><div class="note">${d.ex.length} ejercicios · último: ${lastDone(d.id)}</div></div><button class="btn sm" data-act="start" data-id="${d.id}">Empezar</button></div>`).join("")}</div>`}
-  <p class="note" style="margin-top:18px">Versión 28 oct · ciclo 6 semanas. Fotos: free-exercise-db (dominio público). Usala siempre desde el ícono de la pantalla de inicio: ahí quedan guardados tus datos.</p>`;
+  <p class="note" style="margin-top:18px">Versión 28 oct · reps altas. Fotos: free-exercise-db (dominio público). Usala siempre desde el ícono de la pantalla de inicio: ahí quedan guardados tus datos.</p>`;
 }
 
 function startWorkout(dayId){
@@ -957,7 +979,7 @@ function startWorkout(dayId){
   state.draft={dayId,dayName:dayLabel(day),cyc:cw?cw.id:null,cycName:cw?`Semana ${cw.i+1} · ${cw.n||""} ${cw.lo}–${cw.hi}`:null,startedAt:new Date().toISOString(),vary:varyWeek()?varyWeek().letter:null,ex:resolveDay(day).map(e=>{
     const p=rx(e);const ph=cycPhase(e.id);
     const sg=suggest(e.id,e.sets,p.lo,p.hi,ph);
-    return {id:e.id,lo:p.lo,hi:p.hi,rest:p.rest,sug:{kind:sg.kind,text:sg.text},prev:sg.last?sg.last.sets:null,
+    return {id:e.id,hr:e.hr||null,lo:p.lo,hi:p.hi,rest:p.rest,sug:{kind:sg.kind,text:sg.text},prev:sg.last?sg.last.sets:null,
       sets:Array.from({length:e.sets},(_,i)=>({w:sg.w===""?"":String(sg.w).replace(".",","),r:String(sg.reps[i]),done:false}))};
   })};
   state.confirmFinish=false;
@@ -978,7 +1000,7 @@ function viewWorkout(){
     const lib=LIB[e.id]||{};const [c0,c1]=COLS(e.id);const rest=e.rest??lib.rest??90;
     const complete=e.sets.length&&e.sets.every(s=>s.done);
     return `<section class="excard ${complete?"complete":""}" id="ex-${ei}">
-      <button class="exhead" data-act="info" data-id="${e.id}">${thumb(e.id)}<div class="grow"><h3>${esc(exName(e.id))}</h3><div class="info">${e.sets.length} × ${e.lo}${e.hi!==e.lo?"–"+e.hi:""} ${c1}${rest?` · descanso ${fmtTime(rest)}`:""} · ver técnica</div></div></button>
+      <button class="exhead" data-act="info" data-id="${e.id}">${thumb(e.id)}<div class="grow"><h3>${esc(exName(e.id))}</h3>${e.hr?`<div class="note">En vez de ${esc(exName(e.hr))} (semana de reps altas)</div>`:""}<div class="info">${e.sets.length} × ${e.lo}${e.hi!==e.lo?"–"+e.hi:""} ${c1}${rest?` · descanso ${fmtTime(rest)}`:""} · ver técnica</div></div></button>
       <div><span class="chip ${e.sug.kind}">${esc(e.sug.text)}</span></div>
       <div class="sets">
         <span></span><span class="h" style="text-align:center">${esc(c0)}</span><span class="h" style="text-align:center">${esc(c1)}</span><span></span>
@@ -1208,7 +1230,7 @@ function viewPlan(){
     ${state.confirmPlan===p.key?`<div class="confirm"><b>¿Cambiar a ${esc(p.name)}?</b><span class="note">Reemplaza los días de tu rutina actual. Tu historial y tus pesos se mantienen, así que la progresión sigue donde la dejaste.</span><div class="row"><button class="btn primary grow" data-act="plan-yes" data-k="${p.key}">Cambiar</button><button class="btn grow" data-act="plan-no">Cancelar</button></div></div>`:""}`).join("")}</div>
   <section class="section" style="margin-top:22px">
     <div class="row between"><h3>Ciclo semanal de reps</h3><button class="btn sm ${cy&&cy.on?"":"primary"}" data-act="cyc-toggle">${cy&&cy.on?"Desactivar":"Activar"}</button></div>
-    <div class="note">Cada semana cambia el rango de repeticiones de los ejercicios con peso (6 semanas: 10–12 · 15–20 · 8–10 · 20–25 · 4–6 · 25–30). La app calcula el peso para cada semana con tus marcas. Cardio y plancha siguen igual, y los básicos pesados (sentadilla, peso muerto, press de banca…) nunca pasan de 12. Solo los de aislamiento (curl, elevaciones, gemelos…) llegan a 25–30; el resto de los compuestos queda en 12–15.</div>
+    <div class="note">Cada semana cambia el rango de repeticiones de los ejercicios con peso (6 semanas: 10–12 · 15–20 · 8–10 · 20–25 · 4–6 · 25–30). La app calcula el peso para cada semana con tus marcas. Cardio y plancha siguen igual, y todos los músculos hacen cada semana: en las semanas de más de 12 reps, los básicos pesados (sentadilla, peso muerto, press de banca…) se cambian por otro ejercicio del mismo músculo que sí se puede hacer a muchas reps (prensa, hiperextensiones, press en máquina…).</div>
     ${cy&&cy.on?`<div class="confirm"><div class="row between"><button class="icon" data-act="cyc-prev" aria-label="Semana anterior">${ICON.back}</button><div style="text-align:center"><div class="eyebrow">Esta semana</div><b>Semana ${cw.i+1} de ${cw.total} · ${esc(cw.n||"")} · ${cw.lo}–${cw.hi} reps</b></div><button class="icon" data-act="cyc-next" aria-label="Semana siguiente" style="transform:scaleX(-1)">${ICON.back}</button></div></div>
     ${cy.weeks.map((w,i)=>`<div class="cweek ${cw.i===i?"on":""}"><span class="cn">S${i+1}</span><input id="cn-${i}" data-f="cname" data-i="${i}" value="${esc(w.n||"")}" aria-label="Nombre de la semana" class="ctext"><input id="cl-${i}" data-f="clo" data-i="${i}" inputmode="numeric" value="${w.lo}" aria-label="Reps mínimas"><span class="note">a</span><input id="ch-${i}" data-f="chi" data-i="${i}" inputmode="numeric" value="${w.hi}" aria-label="Reps máximas"><button class="icon" data-act="cyc-rm" data-i="${i}" aria-label="Quitar semana">${ICON.x}</button></div>`).join("")}
     <div class="row"><button class="btn sm grow" data-act="cyc-add">+ Agregar semana</button><button class="btn sm ghost grow" data-act="cyc-preset">Usar ejemplo 12·15·4·30</button></div>`:""}
