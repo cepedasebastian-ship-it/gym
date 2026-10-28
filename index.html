@@ -529,6 +529,7 @@ const VAR_GROUPS=[
   ["cruces_polea","aperturas","aperturas_incl","pec_deck","press_polea"],
   ["fondos","flexiones","fondos_tri","press_polea"],
   ["flexiones","fondos","press_polea","press_suelo_alt","fondos_banco"],
+  ["aperturas","aperturas_incl","pec_deck","cruces_polea","press_polea"],
   ["dominadas","jalon","chin_up","jalon_cerrado"],
   ["jalon","jalon_cerrado","chin_up","dominadas"],
   ["remo_barra","remo_t","remo_dos_manc","remo_supino","remo_manc","remo_incl_manc"],
@@ -589,6 +590,8 @@ const VAR_OF={};for(const g of VAR_GROUPS)if(!VAR_OF[g[0]])VAR_OF[g[0]]=g;
 // Pesas libres: barra, mancuernas o kettlebell
 const isFree=id=>{const e=LIB[id]?.e||"";return /barra|mancuerna|kettlebell/i.test(e)&&!/máquina|polea/i.test(e)};
 const freeOn=()=>state.plan.free!==false;
+const kbOnly=id=>{const e=LIB[id]?.e||"";return /kettlebell/i.test(e)&&!/mancuerna|barra|disco/i.test(e)};
+const gymTier=id=>kbOnly(id)?2:(isFree(id)||!freeOn())?0:1;
 const modeOf=()=>state.plan.mode||"gym";
 const homeOK=id=>{const L=LIB[id];return !!L&&(L.home===true||/kettlebell/i.test(L.e||""))};
 const isKB=id=>/kettlebell/i.test(LIB[id]?.e||"");
@@ -616,38 +619,38 @@ function dayLabel(day,w){const vw=varyWeek();if(!vw)return day.name;const n=(w??
 
 const mk=a=>a.map(([id,sets,lo,hi])=>({id,sets,lo,hi}));
 const DAY={
-  fbA:["Full body A",[["sentadilla",3,6,8],["press_banca",3,6,8],["remo_barra",3,8,10],["elev_lat",3,12,15],["curl_barra",2,10,12],["crunch_polea",3,12,15]]],
-  fbB:["Full body B",[["peso_muerto_rumano",3,8,10],["press_militar",3,6,8],["jalon",3,10,12],["prensa",3,10,12],["triceps_polea",2,10,12],["gemelos",3,12,15],["farmer",3,30,45]]],
-  fbC:["Full body C",[["zancada_bulgara",3,8,10],["press_incl_manc",3,8,12],["dominadas",3,6,10],["hip_thrust",3,8,12],["face_pull",3,12,15],["curl_martillo",2,10,12]]],
-  tA:["Torso A",[["press_banca",4,6,8],["remo_barra",4,6,8],["press_hombro_manc",3,8,10],["jalon",3,10,12],["triceps_polea",3,10,12],["curl_barra",3,10,12]]],
-  pA:["Pierna A",[["sentadilla",4,6,8],["peso_muerto_rumano",3,8,10],["prensa",3,10,12],["curl_femoral",3,10,12],["gemelos",4,12,15],["crunch_polea",3,12,15]]],
-  tB:["Torso B",[["press_militar",4,6,8],["dominadas",4,6,10],["press_incl_manc",3,8,12],["remo_polea",3,10,12],["elev_lat",3,12,15],["curl_martillo",3,10,12]]],
-  pB:["Pierna B",[["peso_muerto",3,4,6],["zancada_bulgara",3,8,10],["hip_thrust",3,8,12],["extension_cuad",3,12,15],["curl_femoral",3,12,15],["elev_piernas",3,10,15],["farmer",3,30,45]]],
-  emA:["Empuje A",[["press_banca",4,6,8],["press_militar",3,6,8],["press_incl_manc",3,8,12],["elev_lat",3,12,15],["triceps_polea",3,10,12],["fondos",2,8,12]]],
-  tiA:["Tirón A",[["dominadas",4,6,10],["remo_barra",3,6,8],["remo_polea",3,10,12],["face_pull",3,12,15],["curl_barra",3,10,12],["curl_martillo",2,10,12]]],
-  piA:["Pierna A",[["sentadilla",4,6,8],["peso_muerto_rumano",3,8,10],["prensa",3,10,12],["curl_femoral",3,10,12],["extension_cuad",2,12,15],["gemelos",4,12,15]]],
-  emB:["Empuje B",[["press_militar",4,6,8],["press_incl_manc",3,8,12],["cruces_polea",3,12,15],["elev_lat",4,12,15],["press_frances",3,10,12],["triceps_polea",2,12,15]]],
-  tiB:["Tirón B",[["peso_muerto",3,4,6],["jalon",3,10,12],["remo_manc",3,8,12],["face_pull",3,12,15],["curl_martillo",3,10,12],["crunch_polea",3,12,15],["farmer",3,30,45]]],
-  kbA:["Kettlebell A",[["goblet",4,8,12],["press_kb",3,6,10],["remo_kb",3,8,12],["kb_swing",4,15,20],["curl_kb",2,10,15],["plancha",3,30,60]]],
-  kbB:["Kettlebell B",[["pm_una_pierna",3,8,10],["press_suelo_kb",3,8,12],["renegade",3,6,10],["zancada_kb",3,8,12],["triceps_kb",2,10,15],["kb_windmill",3,5,8]]],
-  kbC:["Kettlebell C",[["kb_clean1",4,5,8],["step_up_kb",3,8,12],["kb_push_press1",3,6,8],["kb_high_pull",3,10,15],["turkish",3,2,3],["farmer",3,30,45]]],
-  kbTA:["KB Torso A",[["press_kb",4,6,10],["remo_kb",4,8,12],["press_suelo_kb",3,8,12],["kb_high_pull",3,10,15],["curl_kb",3,10,15],["triceps_kb",3,10,15]]],
-  kbPA:["KB Pierna A",[["goblet",4,8,12],["kb_swing",4,15,20],["zancada_kb",3,8,12],["pm_una_pierna",3,8,10],["gemelos_kb",3,12,20],["plancha",3,30,60]]],
-  kbTB:["KB Torso B",[["kb_push_press1",4,6,8],["renegade",3,6,10],["flexiones",3,8,15],["kb_pirata",3,8,12],["kb_windmill",3,5,8],["kb_figura8",3,10,16]]],
-  kbPB:["KB Pierna B",[["kb_clean1",4,5,8],["step_up_kb",3,8,12],["puente_una_pierna",3,10,15],["lunge_pass",3,8,12],["turkish",3,2,3],["farmer",3,30,45]]],
-  piB:["Pierna B",[["zancada_bulgara",3,8,10],["hip_thrust",3,8,12],["prensa",3,12,15],["curl_femoral",3,12,15],["gemelos",4,12,15],["elev_piernas",3,10,15]]]
+  fbA:["Full body A",[["sentadilla",3,6,8],["press_banca",3,6,8],["remo_barra",3,8,10],["peso_muerto_rumano",3,8,10],["press_hombro_manc",3,8,10],["elev_lat",3,12,15],["curl_barra",2,10,12],["triceps_polea",2,10,12],["crunch_polea",3,12,15]]],
+  fbB:["Full body B",[["peso_muerto",3,4,6],["press_militar",3,6,8],["jalon",3,10,12],["zancadas",3,8,12],["press_incl_manc",3,8,12],["remo_manc",3,8,12],["press_frances",2,10,12],["gemelos",3,12,15],["farmer",3,30,45]]],
+  fbC:["Full body C",[["zancada_bulgara",3,8,10],["press_incl_manc",3,8,12],["dominadas",3,6,10],["hip_thrust",3,8,12],["remo_polea",3,10,12],["press_hombro_manc",3,10,12],["face_pull",3,12,15],["curl_martillo",2,10,12],["triceps_polea",2,10,12]]],
+  tA:["Torso A",[["press_banca",4,6,8],["remo_barra",4,6,8],["press_hombro_manc",3,8,10],["jalon",3,10,12],["press_incl_manc",3,8,12],["elev_lat",3,12,15],["triceps_polea",3,10,12],["curl_barra",3,10,12]]],
+  pA:["Pierna A",[["sentadilla",4,6,8],["peso_muerto_rumano",3,8,10],["zancadas",3,10,12],["prensa",3,10,12],["curl_femoral",3,10,12],["extension_cuad",2,12,15],["gemelos",4,12,15],["crunch_polea",3,12,15]]],
+  tB:["Torso B",[["press_militar",4,6,8],["dominadas",4,6,10],["press_banca",3,8,10],["remo_polea",3,10,12],["remo_manc",3,8,12],["face_pull",3,12,15],["curl_martillo",3,10,12],["press_frances",3,10,12]]],
+  pB:["Pierna B",[["peso_muerto",3,4,6],["zancada_bulgara",3,8,10],["hip_thrust",3,8,12],["goblet",3,10,12],["curl_femoral",3,12,15],["abductor",3,12,15],["gemelos",3,12,15],["farmer",3,30,45],["elev_piernas",3,10,15]]],
+  emA:["Empuje A",[["press_banca",4,6,8],["press_militar",3,6,8],["press_incl_manc",3,8,12],["cruces_polea",3,12,15],["elev_lat",3,12,15],["aperturas",3,10,12],["triceps_polea",3,10,12],["press_frances",3,10,12]]],
+  tiA:["Tirón A",[["dominadas",4,6,10],["remo_barra",3,6,8],["remo_polea",3,10,12],["remo_manc",3,8,12],["face_pull",3,12,15],["encogimientos",3,10,12],["curl_barra",3,10,12],["curl_martillo",2,10,12]]],
+  piA:["Pierna A",[["sentadilla",4,6,8],["peso_muerto_rumano",3,8,10],["prensa",3,10,12],["zancadas",3,10,12],["curl_femoral",3,10,12],["extension_cuad",2,12,15],["gemelos",4,12,15],["crunch_polea",3,12,15]]],
+  emB:["Empuje B",[["press_hombro_manc",4,8,10],["press_banca",3,8,10],["press_incl_manc",3,8,12],["cruces_polea",3,12,15],["elev_lat",4,12,15],["press_frances",3,10,12],["triceps_polea",2,12,15],["aperturas",3,10,12]]],
+  tiB:["Tirón B",[["peso_muerto",3,4,6],["jalon",3,10,12],["remo_barra",3,8,10],["remo_manc",3,8,12],["face_pull",3,12,15],["curl_barra",3,10,12],["curl_martillo",3,10,12],["farmer",3,30,45],["crunch_polea",3,12,15]]],
+  kbA:["Kettlebell A",[["goblet",4,8,12],["press_kb",3,6,10],["remo_kb",3,8,12],["kb_swing",4,15,20],["zancada_kb",3,8,12],["press_suelo_kb",3,8,12],["curl_kb",2,10,15],["triceps_kb",2,10,15],["plancha",3,30,60]]],
+  kbB:["Kettlebell B",[["kb_clean1",4,5,8],["step_up_kb",3,8,12],["kb_push_press1",3,6,8],["renegade",3,6,10],["pm_una_pierna",3,8,10],["kb_high_pull",3,10,15],["curl_kb",2,10,15],["triceps_kb",2,10,15],["kb_windmill",3,5,8]]],
+  kbC:["Kettlebell C",[["goblet",3,10,12],["pm_kb",3,8,12],["press_kb",3,6,10],["remo_kb",3,8,12],["lunge_pass",3,8,12],["kb_pirata",3,8,12],["kb_figura8",3,10,16],["turkish",3,2,3],["farmer",3,30,45]]],
+  kbTA:["KB Torso A",[["press_kb",4,6,10],["remo_kb",4,8,12],["press_suelo_kb",3,8,12],["renegade",3,6,10],["kb_high_pull",3,10,15],["kb_pirata",3,8,12],["curl_kb",3,10,15],["triceps_kb",3,10,15]]],
+  kbPA:["KB Pierna A",[["goblet",4,8,12],["kb_swing",4,15,20],["zancada_kb",3,8,12],["pm_una_pierna",3,8,10],["step_up_kb",3,8,12],["gemelos_kb",3,12,20],["kb_windmill",3,5,8],["farmer",3,30,45],["plancha",3,30,60]]],
+  kbTB:["KB Torso B",[["kb_push_press1",4,6,8],["remo_kb",3,8,12],["press_suelo_kb",3,8,12],["renegade",3,6,10],["kb_pirata",3,8,12],["curl_kb",3,10,15],["triceps_kb",3,10,15],["kb_figura8",3,10,16],["flexiones",3,8,15]]],
+  kbPB:["KB Pierna B",[["kb_clean1",4,5,8],["goblet",3,10,12],["pm_kb",3,8,12],["lunge_pass",3,8,12],["step_up_kb",3,8,12],["kb_swing",3,15,20],["turkish",3,2,3],["farmer",3,30,45],["puente_una_pierna",3,10,15]]],
+  piB:["Pierna B",[["zancada_bulgara",3,8,10],["hip_thrust",3,8,12],["goblet",3,10,12],["prensa",3,12,15],["curl_femoral",3,12,15],["abductor",3,12,15],["gemelos",4,12,15],["farmer",3,30,45],["elev_piernas",3,10,15]]]
 };
 const PLANS=[
   {key:"fb3",name:"Full body",dpw:3,desc:"Todo el cuerpo en cada sesión. Ideal si vas 3 veces por semana (lun-mié-vie).",days:["fbA","fbB","fbC"]},
   {key:"ppl3",name:"Empuje · Tirón · Pierna",dpw:3,desc:"Cada día un grupo: pecho/hombro/tríceps, espalda/bíceps, piernas. Más volumen por músculo.",days:["emA","tiA","piA"]},
   {key:"tl4",name:"Torso · Pierna",dpw:4,desc:"Dos de torso y dos de pierna por semana. Buen equilibrio entre volumen y descanso.",days:["tA","pA","tB","pB"]},
   {key:"ppl6",name:"Empuje · Tirón · Pierna ×2",dpw:6,desc:"Cada músculo dos veces por semana con variantes A y B. Para cuando vas casi todos los días.",days:["emA","tiA","piA","emB","tiB","piB"]},
-  {key:"kb3",mode:"casa",name:"Kettlebell full body",dpw:3,desc:"Todo el cuerpo en cada sesión, solo con kettlebells. Ideal 3 veces por semana en casa.",days:["kbA","kbB","kbC"]},
+  {key:"kb3",mode:"casa",name:"Kettlebell full body",dpw:3,desc:"8–9 ejercicios con kettlebell por sesión, todo el cuerpo. Ideal 3 veces por semana en casa.",days:["kbA","kbB","kbC"]},
   {key:"kb4",mode:"casa",name:"Kettlebell torso · pierna",dpw:4,desc:"Dos días de torso y dos de pierna con kettlebells. Más volumen por músculo.",days:["kbTA","kbPA","kbTB","kbPB"]}
 ];
 const GOALS={
   musculo:{n:"Ganar músculo",d:"Pesos medios a 6–15 reps y descansos de 1–2,5 min. El clásico para crecer."},
-  fuerza:{n:"Fuerza",d:"Básicos pesados a 3–5 reps, descansos largos y pocos accesorios."},
+  fuerza:{n:"Fuerza",d:"Básicos pesados a 3–5 reps con descansos largos, y accesorios a 6–10."},
   grasa:{n:"Bajar grasa",d:"Fuerza a 8–15 reps con descansos cortos, un bloque intenso y cardio al final."},
   tono:{n:"Tonificar",d:"Más reps (12–15), mancuernas y máquinas, plancha y cardio corto."}
 };
@@ -658,20 +661,20 @@ const CARDIO_GYM=["cinta","bici","remo_ergo","eliptica","escaladora","bici_recli
 const TONO_SUB={sentadilla:"goblet",peso_muerto:"peso_muerto_rumano",press_militar:"press_hombro_manc",remo_barra:"remo_manc",fondos:"flexiones",dominadas:"jalon",zancada_bulgara:"zancadas"};
 function applyGoal(exs,goal,di,mode){
   const base=exs.map(e=>({...e}));const CARDIO=mode==="casa"?HOME_CARDIO:CARDIO_GYM;
-  if(goal==="fuerza")return [...base.slice(0,5),...(base.slice(5).some(e=>e.id==="farmer")?[{id:"farmer",sets:3,lo:20,hi:30,rest:120}]:[])].map(e=>e.id==="farmer"?e:MAIN.has(e.id)?{...e,sets:5,lo:3,hi:5,rest:180}:COMP2.has(e.id)?{...e,sets:3,lo:6,hi:8,rest:120}:{...e,sets:3,lo:8,hi:10,rest:90});
+  if(goal==="fuerza")return [...base.slice(0,7),...(base.slice(7).some(e=>e.id==="farmer")?[{id:"farmer",sets:3,lo:20,hi:30,rest:120}]:[])].map(e=>e.id==="farmer"?e:MAIN.has(e.id)?{...e,sets:5,lo:3,hi:5,rest:180}:COMP2.has(e.id)?{...e,sets:3,lo:6,hi:8,rest:120}:{...e,sets:3,lo:8,hi:10,rest:90});
   if(goal==="grasa"){
-    const st=base.slice(0,4).map(e=>(MAIN.has(e.id)||COMP2.has(e.id))?{...e,sets:3,lo:8,hi:12,rest:75}:{...e,sets:3,lo:12,hi:15,rest:60});
-    const meta=[{id:"kb_swing",sets:3,lo:15,hi:20,rest:45},{id:"escaladores",sets:3,lo:30,hi:45,rest:30},{id:"farmer",sets:3,lo:40,hi:60,rest:60}][di%3];
-    return [...st,meta,{id:CARDIO[di%CARDIO.length],sets:1,lo:20,hi:30,rest:0}];
+    const st=base.slice(0,7).map(e=>(MAIN.has(e.id)||COMP2.has(e.id))?{...e,sets:3,lo:8,hi:12,rest:75}:{...e,sets:3,lo:12,hi:15,rest:60});
+    const meta=[mode==="casa"?{id:"kb_swing",sets:3,lo:15,hi:20,rest:45}:{id:"cuerdas",sets:3,lo:30,hi:45,rest:45},{id:"escaladores",sets:3,lo:30,hi:45,rest:30},{id:"farmer",sets:3,lo:40,hi:60,rest:60}][di%3];
+    return [...st.filter(e=>e.id!==meta.id),meta,{id:CARDIO[di%CARDIO.length],sets:1,lo:15,hi:20,rest:0}];
   }
   if(goal==="tono"){
     const seen=new Set(base.map(e=>e.id));
-    const st=base.slice(0,5).map(e=>{const sub=TONO_SUB[e.id];const id=sub&&!seen.has(sub)?sub:e.id;seen.add(id);return {...e,id,sets:3,lo:12,hi:15,rest:60}});
+    const st=base.slice(0,7).map(e=>{const sub=TONO_SUB[e.id];const id=sub&&!seen.has(sub)?sub:e.id;seen.add(id);return {...e,id,sets:3,lo:12,hi:15,rest:60}});
     return [...st,di%2?{id:"crunch_inverso",sets:3,lo:12,hi:20,rest:45}:{id:"plancha",sets:3,lo:30,hi:60,rest:45},{id:CARDIO[(di+1)%CARDIO.length],sets:1,lo:10,hi:15,rest:0}];
   }
   return base;
 }
-function buildPlan(key,goal){const g=goal||"musculo";const p=PLANS.find(p=>p.key===key)||PLANS[2];const mode=p.mode||"gym";return {key:p.key,mode,goal:g,name:p.name,days:p.days.map((k,i)=>({id:"d"+(i+1)+k,name:DAY[k][0],ex:applyGoal(mk(DAY[k][1]),g,i,mode)}))}}
+function buildPlan(key,goal){const g=goal||"musculo";const p=PLANS.find(p=>p.key===key)||PLANS[2];const mode=p.mode||"gym";return {key:p.key,mode,tv:2,goal:g,name:p.name,days:p.days.map((k,i)=>({id:"d"+(i+1)+k,name:DAY[k][0],ex:applyGoal(mk(DAY[k][1]),g,i,mode)}))}}
 const DEFAULT_PLAN=(()=>{const p=buildPlan("tl4");delete p.goal;return p})();
 
 // ---------- Utilidades ----------
@@ -741,7 +744,7 @@ const Cloud={
     const S=useC?C:L;
     return {v:1,plan:S.plan||L.plan,planOther:S.planOther??L.planOther??null,kbs:S.kbs??L.kbs??null,cycle:S.cycle??null,vary:S.vary??null,settingsAt:Math.max(L.settingsAt||0,C.settingsAt||0),sessions:[...byId.values()],deleted:del.slice(-500)}},
   apply(D){
-    state.plan=D.plan;state.cycle=D.cycle;state.vary=D.vary;state.kbs=D.kbs;state.sessions=D.sessions;sortSessions();lsSet("gym.planOther",D.planOther);lsSet("gym.kbs",D.kbs);
+    state.plan=D.plan;state.cycle=D.cycle;state.vary=D.vary;state.kbs=D.kbs;state.sessions=D.sessions;sortSessions();lsSet("gym.planOther",D.planOther);lsSet("gym.kbs",D.kbs);if(migrateAll())Cloud.soon();
     lsSet("gym.plan",D.plan);lsSet("gym.cycle",D.cycle);lsSet("gym.vary",D.vary);lsSet("gym.sessions",state.sessions);lsSet("gym.deleted",D.deleted);lsSet("gym.settingsAt",D.settingsAt)},
   soon(ms){if(!this.on)return;clearTimeout(this.timer);this.timer=setTimeout(()=>this.sync(),ms??2000)},
   async sync(){
@@ -787,6 +790,14 @@ const state={
   tab:"train", importData:null, sheet:null, confirmFinish:false, confirmDel:null, confirmPlan:null, confirmGoal:null, rest:null
 };
 state.inWorkout=!!state.draft;
+// rutinas guardadas con plantillas viejas: se rearman con las nuevas (mismos días, mismo historial)
+const TPL_V=2;
+function migratePlan(p){if(!p||p.tv===TPL_V||!PLANS.some(x=>x.key===p.key))return p;
+  const n=buildPlan(p.key,p.goal||"musculo");if(p.free===false)n.free=false;if(!p.goal)delete n.goal;n.tv=TPL_V;return n}
+function migrateAll(){let ch=false;const np=migratePlan(state.plan);if(np!==state.plan){state.plan=np;lsSet("gym.plan",np);ch=true}
+  const o=lsGet("gym.planOther");const no=migratePlan(o);if(no!==o){lsSet("gym.planOther",no);ch=true}
+  if(ch&&typeof touchSettings==="function"){touchSettings()}return ch}
+migrateAll();
 // ---------- Ciclo semanal ----------
 const CYCLE_PRESET=[{n:"Base",lo:10,hi:12},{n:"Volumen",lo:13,hi:15},{n:"Pesada",lo:4,hi:6},{n:"Liviana",lo:25,hi:30}];
 function mondayOf(d){const x=new Date(d);x.setHours(0,0,0,0);x.setDate(x.getDate()-((x.getDay()+6)%7));return x}
@@ -812,12 +823,12 @@ function resolveWeek(w){
       let id=e.id;
       if(g0&&!fixed){
         // con "priorizar pesas libres", si el grupo tiene opciones con pesas, solo se usan esas
-        const fr=modeOf()==="casa"?g0.filter(homeOK):(freeOn()?g0.filter(isFree):[]);const g=fr.length?fr:g0;
-        const start=w%g.length;let pick=null;
-        for(let k=0;k<g.length;k++){const c=g[(start+k)%g.length];if(!used.has(c)&&LIB[c]){pick=c;break}}
-        // si ya se usaron todas las versiones con pesas, recién ahí una máquina antes que repetir
-        if(!pick&&g!==g0&&modeOf()!=="casa"){const s2=w%g0.length;for(let k=0;k<g0.length;k++){const c=g0[(s2+k)%g0.length];if(!used.has(c)&&LIB[c]){pick=c;break}}}
-        id=pick||g[start];
+        // gym: primero barra y mancuernas, después máquinas/poleas y recién al final kettlebell. Casa: solo kettlebell o peso corporal
+        const tiers=modeOf()==="casa"?(isKB(e.id)?[g0.filter(isKB)]:[g0.filter(homeOK)]):[0,1,2].map(t=>g0.filter(c=>LIB[c]&&gymTier(c)===t));
+        const T=tiers.filter(x=>x.length);if(!T.length)T.push(g0);
+        let pick=null;
+        for(const g of T){const start=w%g.length;for(let k=0;k<g.length;k++){const c=g[(start+k)%g.length];if(!used.has(c)&&LIB[c]){pick=c;break}}if(pick)break}
+        id=pick||T[0][w%T[0].length];
       }
       used.add(id);
       return {...e,id,base:e.id}})}
@@ -923,7 +934,7 @@ function viewHome(){
   </section>`})():(!nd?`<p class="muted">No tenés días en la rutina. Armá uno en la pestaña Rutina.</p>`:"")}
   ${state.draft?"":`<div style="margin-top:22px" class="eyebrow">Otro día</div>
   <div>${days.filter(d=>d!==nd).map(d=>`<div class="daycard"><div class="grow"><h3>${esc(dayLabel(d))}</h3><div class="note">${d.ex.length} ejercicios · último: ${lastDone(d.id)}</div></div><button class="btn sm" data-act="start" data-id="${d.id}">Empezar</button></div>`).join("")}</div>`}
-  <p class="note" style="margin-top:18px">Versión 26 oct · Casa. Fotos: free-exercise-db (dominio público). Usala siempre desde el ícono de la pantalla de inicio: ahí quedan guardados tus datos.</p>`;
+  <p class="note" style="margin-top:18px">Versión 28 oct. Fotos: free-exercise-db (dominio público). Usala siempre desde el ícono de la pantalla de inicio: ahí quedan guardados tus datos.</p>`;
 }
 
 function startWorkout(dayId){
